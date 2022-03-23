@@ -1,0 +1,80 @@
+[
+    {
+        "type":"MAGICEDEN",
+        "name":"Magic Eden Sniper",
+        "path":"magiceden.js",
+        "config":"magiceden.csv",
+        "config_map":["secret_key","collection_name","delay_requests","wish_price"],
+        "task_input":[
+            {
+                "type":"input",
+                "message":"Payer Secret Key: ",
+                "name":"secret_key"
+            },
+            {
+                "type":"input",
+                "message":"Collection Name: ",
+                "name":"collection_name"
+            },
+            {
+                "type":"number",
+                "message":"Delay Between Requests (in milliseconds): ",
+                "name":"delay_requests"
+            },
+            {
+                "type":"number",
+                "message":"Wish Price: ",
+                "name":"wish_price"
+            }
+        ]
+    },
+    {
+        "type":"ETHCONTRACT",
+        "name":"ETH Contract Mint",
+        "path":"ethcontract.js",
+        "config":"input.json",
+        "config_map":["contract_address","function_name","private_key","gas_price", "price"],
+        "task_input":[
+            {
+                "type":"input",
+                "message":"Contract Address: ",
+                "name":"contract_address"
+            },
+            {
+                "type":"input",
+                "message":"Function Name: ",
+                "name":"function_name"
+            },
+            {
+                "type":"input",
+                "message":"Private Key:",
+                "name":"private_key"
+            },
+            {
+                "type":"number",
+                "message":"Gas Price: ",
+                "name":"gas_price"
+            },
+            {
+                "type":"number",
+                "message":"Price: ",
+                "name":"price" 
+            }
+        ]
+    },
+    {
+        "type":"SOLBALANCE",
+        "name":"SOL Wallet Balance Checker",
+        "path":"solbalance.js",
+        "config":"magiceden.csv",
+        "config_map":["balanceprivkey"],
+        "task_input":[
+            {
+                "type":"input",
+                "message":"Private Key: ",
+                "name":"balanceprivkey"
+            }
+        ]
+    }
+
+]

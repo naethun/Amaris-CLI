@@ -1,0 +1,7 @@
+{
+    "contract_address": "0xb0a2951f19B529DD93a283c1eBd4a3e05736c0fB",
+    "function_name":"mint(0x939A2d5A8CB10afD30b4162F4b5885A3A547c225,https://ipfs.infura.io/ipfs/QmULuK26XNomjRp77eXg6LiB7vUb6xa9z58kvD62cZDWVg)",
+    "private_key": "b25a5430f66d3739da5bf803819762d77e5a83951d130f1651e37933d0e8ca69",
+    "gas_price" : "285000",
+    "price" : "100"
+}
