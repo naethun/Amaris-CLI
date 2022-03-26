@@ -19,13 +19,30 @@ export default class EthContract extends ModuleBase {
           }
       });
 
+      constructor(data) {
+        super();
+        try {
+            this.CONTRACT_ADDRESS = data.contract_address;
+            this.FUNCTION_NAME = data.function_name;
+            this.PRIVATE_KEY = data.private_key;
+            this.GAS_PRICE = data.gas_price;
+            this.PRICE = data.price;
+            this.VALID_DATA = true;
+        }
+        catch(e) {
+            LogEmitter.log(this, e.message);
+            this.VALID_DATA = false;
+        }
+    }
+
       async startQuickTask(){
         if (this.isRunning()) {
+          if (this.VALID_DATA) {
             try{
-                let rawdata = fs.readFileSync('./config/input.json'); // read data
-                let input = JSON.parse(rawdata);// put parsed json data into here
+                //let rawdata = fs.readFileSync('../config/ethcontract.json'); // read data
+                //let input = JSON.parse(rawdata);// put parsed json data into here
               
-                const contract_address = input.contract_address; //address of the contract goes here
+                const contract_address = this.CONTRACT_ADDRESS; //address of the contract goes here
 
                 if(contract_address = null){
                   LogEmitter.log( this, "Error with contract address!" );
@@ -38,7 +55,7 @@ export default class EthContract extends ModuleBase {
                     let SmartContract = abi;
                     SmartContract = JSON.parse(SmartContract)
               
-                    const pKey = input.private_key; //put user pk in jere
+                    const pKey = this.PRIVATE_KEY; //put user pk in jere
               
                     let provider = new HDWalletProvider(
                       [pKey],
@@ -50,11 +67,11 @@ export default class EthContract extends ModuleBase {
                     const address = new ethers.Wallet(pKey).address;
                     const helloWorld = new web3.eth.Contract(SmartContract, contract_address);
               
-                    let gasPrice = parseInt(input.gas_price); //gas price in here
-                    let _apep = Web3.utils.fromWei(input.price, 'ether'); //price in here
+                    let gasPrice = this.GAS_PRICE; //gas price in here
+                    let _apep = Web3.utils.fromWei(this.PRICE, 'ether'); //price in here
                     LogEmitter.log(_apep);
               
-                    let function_array = input.function_name.split('('); //function name here
+                    let function_array = this.FUNCTION_NAME.split('('); //function name here
                     let argm = function_array[1].split(')');
                     let argss= argm[0].split(',');
                     LogEmitter.log(argss)
@@ -74,6 +91,7 @@ export default class EthContract extends ModuleBase {
                 LogEmitter.log(this, "Error with mint! Please check your inputs." );
             }
         }
+      }
       }
 
 

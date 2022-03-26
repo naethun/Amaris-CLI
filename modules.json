@@ -32,7 +32,7 @@
         "type":"ETHCONTRACT",
         "name":"ETH Contract Mint",
         "path":"ethcontract.js",
-        "config":"input.json",
+        "config":"ethcontract.json",
         "config_map":["contract_address","function_name","private_key","gas_price", "price"],
         "task_input":[
             {
@@ -63,16 +63,26 @@
         ]
     },
     {
-        "type":"SOLBALANCE",
-        "name":"SOL Wallet Balance Checker",
-        "path":"solbalance.js",
-        "config":"magiceden.csv",
-        "config_map":["balanceprivkey"],
+        "type":"CMV2Mint",
+        "name":"Candy Machine V2 Mint",
+        "path":"cmv2.js",
+        "config":"cmv2.csv",
+        "config_map":["url,private_key,cmid"],
         "task_input":[
             {
                 "type":"input",
+                "message":"URL: ",
+                "name":"url"
+            },
+            {
+                "type":"input",
                 "message":"Private Key: ",
-                "name":"balanceprivkey"
+                "name":"private_key"
+            },
+            {
+                "type":"input",
+                "message":"Candy Machine ID (CMID): ",
+                "name":"cmid"
             }
         ]
     }
