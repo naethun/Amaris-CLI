@@ -8,16 +8,15 @@ import { LogEmitter } from "../libs/log.js";
 import { ModuleBase } from "./module_base.js";
 
 export default class EthContract extends ModuleBase {
-      getContractAbi = (async function(contract) {
-          if(this.isRunning){
+      getContractAbi = ( function(contract) {
             return new Promise(resolve => {
                 axios.get(`https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${contract}&apikey=8PYU2IVYBPRXZEYI28FPTK5CIE53K85SU6`)
                 .then((response) => {
                   resolve(response.data.result);
                 });  
               });
-          }
       });
+    
 
       constructor(data) {
         super();
@@ -41,9 +40,6 @@ export default class EthContract extends ModuleBase {
             try{
                 //let rawdata = fs.readFileSync('../config/ethcontract.json'); // read data
                 //let input = JSON.parse(rawdata);// put parsed json data into here
-              
-                const contract_address = this.CONTRACT_ADDRESS; //address of the contract goes here
-
                 if(contract_address = null){
                   LogEmitter.log( this, "Error with contract address!" );
                 }
@@ -51,7 +47,7 @@ export default class EthContract extends ModuleBase {
                   LogEmitter.log( this, "Error with Smart Contract!" );
                 }
 
-                 (abi) => {
+                 await this.getContractAbi(this.CONTRACT_ADDRESS).then ( async (abi) => {
                     let SmartContract = abi;
                     SmartContract = JSON.parse(SmartContract)
               
@@ -64,8 +60,8 @@ export default class EthContract extends ModuleBase {
                     );
               
                     const web3 = new Web3(provider);
-                    const address = new ethers.Wallet(pKey).address;
-                    const helloWorld = new web3.eth.Contract(SmartContract, contract_address);
+                    const address = new ethers.Wallet(this.PRIVATE_KEY).address;
+                    const helloWorld = new web3.eth.Contract(SmartContract, this.CONTRACT_ADDRESS);
               
                     let gasPrice = this.GAS_PRICE; //gas price in here
                     let _apep = Web3.utils.fromWei(this.PRICE, 'ether'); //price in here
@@ -79,14 +75,14 @@ export default class EthContract extends ModuleBase {
                     var doTestFunc = helloWorld.methods[function_array[0]];
                     let tes = [...argss]
               
-                    console.log(doTestFunc(...tes).send({
+                    LogEmitter.log(doTestFunc(...tes).send({
                       gasLimit: gasPrice, 
-                      to: contract_address,
+                      to: this.CONTRACT_ADDRESS,
                       from: address,
                       value: (parseInt(_apep)).toString(),
                     }))
                     LogEmitter.log( this, "Successfully minted!" );
-                }
+                })
             } catch {
                 LogEmitter.log(this, "Error with mint! Please check your inputs." );
             }
