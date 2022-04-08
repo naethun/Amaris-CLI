@@ -5,7 +5,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+        step((generator = generator.apply(thisArg, _arguments || [])));
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
@@ -69,7 +69,7 @@ export default class CMV2Mint extends ModuleBase {
                     LogEmitter.log(this, "Starting task...")
 
                     __awaiter(this, void 0, void 0, function () {
-                        var prv, id, bin, candyMachineId, candyMachineIds, NodeWallet, wallet, balanace, cndy, mintTxId, statuses, e_1;
+                        var prv, id, bin, candyMachineId, NodeWallet, wallet, balanace, cndy, mintTxId, statuses, e_1;
             
                         __generator(this, function (_a) {
                             switch (_a.label) {
@@ -82,7 +82,7 @@ export default class CMV2Mint extends ModuleBase {
                                     wallet = ModuleBase.local;
                                     bin = Keypair.fromSecretKey(bs58.decode(prv));;
             
-                                    candyMachineId = new PublicKey(id);
+                                    candyMachineId = new anchor.web3.PublicKey(id);
             
                                     return [4 /*yield*/, connection.getBalance(wallet.publicKey)];
                                 case 1:
