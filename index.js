@@ -2,7 +2,7 @@ import inquirer from "inquirer";
 import fs from "fs";
 import fetch from 'node-fetch';
 import setTitle from "node-bash-title";
-setTitle('CLI');
+setTitle('Amaris CLI');
 
 import { CSVParser } from "./libs/csv.js";
 
@@ -28,7 +28,7 @@ let modules;
 
 console.log(
     chalk.bold.magenta(
-        figlet.textSync('Nemesis', { horizontalLayout: 'full' })
+        figlet.textSync('Amaris CLI', { horizontalLayout: 'full' })
     )
 );
 const init = async () => {
