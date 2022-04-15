@@ -1,9 +1,8 @@
 import inquirer from "inquirer";
 import fs from "fs";
 import fetch from 'node-fetch';
-
 import setTitle from "node-bash-title";
-setTitle('Nemesis Automation');
+setTitle('CLI');
 
 import { CSVParser } from "./libs/csv.js";
 
@@ -27,19 +26,25 @@ let modules;
     ModuleRunner.destroyAll();
 });*/
 
-
+console.log(
+    chalk.bold.magenta(
+        figlet.textSync('Nemesis', { horizontalLayout: 'full' })
+    )
+);
 const init = async () => {
     modules = JSON.parse(fs.readFileSync("./modules.json"));
+    var rawdata = fs.readFileSync('./auth.json');
+    var key = JSON.parse(rawdata);
+
     var auth = null
     
-    var key = 'TELIOS-64935C-D5B5155C-4600F4W'
     const options = {
         method: "GET",
         headers: {
             "Authorization": "Bearer MTE2OWEzMzE4MWQ1Mzc1NTg3MzVhZDM3YWU0MjdjZTZjYTU3ZTdhMmU4OmI3Y2UzNGE2NTc4MGYzNjZhMDA0NDIzMjhmYjA5N2FjMmRjNjY4YjE2ZQ=="
         }
     };
-    fetch(`https://api.whop.io/api/v1/licenses/${key}`, options)
+    fetch(`https://api.whop.io/api/v1/licenses/${key.key}`, options)
     .then((response) => {
         if (response.status === 200) {
             return response.json();
@@ -61,12 +66,6 @@ const init = async () => {
 }
 
 const startMenu = () => {
-    console.log(
-        chalk.bold.magenta(
-            figlet.textSync('Nemesis', { horizontalLayout: 'full' })
-        )
-    );
-    
     global.prompt = inquirer.prompt([
         {
             type:"list",
