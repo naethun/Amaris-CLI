@@ -67,7 +67,7 @@
         "name":"Candy Machine V2 Mint",
         "path":"cmv2.js",
         "config":"cmv2.csv",
-        "config_map":["rpc,private_key,cmid"],
+        "config_map":["rpc", "private_key", "cmid"],
         "task_input":[
             {
                 "type":"input",

@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function () { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function () { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -35,9 +35,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
-var buffer_1 = require("buffer");
-var web3_js_1 = require("@solana/web3.js");
+
+const buffer_1 = require('buffer');
+const web3_js_1 = require('@solana/web3.js');
+
+//import buffer_1 from 'buffer';
+//import web3_js_1 from '@solana/web3.js';
 /**
  * Node only wallet.
  */
@@ -64,9 +67,9 @@ var NodeWallet = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, txs.map(function (t) {
-                        t.partialSign(_this.payer);
-                        return t;
-                    })];
+                    t.partialSign(_this.payer);
+                    return t;
+                })];
             });
         });
     };
@@ -79,4 +82,5 @@ var NodeWallet = /** @class */ (function () {
     });
     return NodeWallet;
 }());
-exports["default"] = NodeWallet;
+
+module.exports = { NodeWallet };
