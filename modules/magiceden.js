@@ -7,6 +7,7 @@ import {
 import { HTTPUtils as httpUtils } from "../libs/http.js";
 import { LogEmitter } from "../libs/log.js";
 import { ModuleBase } from "./module_base.js";
+import chalk from "chalk";
 
 export default class MagicEdenModule extends ModuleBase {
     //used to hold nft data before purchase
@@ -34,7 +35,7 @@ export default class MagicEdenModule extends ModuleBase {
         if (this.isRunning()) {
             if (this.VALID_DATA) {
                 try {
-                    LogEmitter.log(this, "Monitoring for Collection: " + this.COLLECTION_NAME);
+                    console.log(chalk.yellow("Monitoring for Collection: " + this.COLLECTION_NAME));
 
                     let displayLimit = 9
                     let priceLimit = this.WISH_PRICE * 1e9
@@ -85,7 +86,7 @@ export default class MagicEdenModule extends ModuleBase {
                                 }
                             }
                             else {
-                                LogEmitter.log(this, "No items found. Retrying...");
+                                console.log(chalk.yellow("No items found. Retrying..."));
                                 setTimeout(this.startQuickTask.bind(this), this.DELAY);
                             }
                         }
@@ -93,17 +94,17 @@ export default class MagicEdenModule extends ModuleBase {
                             setTimeout(this.startQuickTask.bind(this), this.DELAY);
                         }
                     }).catch((e) => {
-                        LogEmitter.log(this, e.message);
+                        console.log(chalk.yellow(e.message));
                         setTimeout(this.startQuickTask.bind(this), this.DELAY);
                     });
                 }
                 catch (err) {
-                    LogEmitter.log(this, err.message);
+                    console.log(chalk.red(err.message));
                     return;
                 }
             }
             else {
-                LogEmitter.log(this, "Invalid data provided, please check for values.");
+                console.log(chalk.red("Invalid data provided, please check your inputs."));
             }
         }
     }
@@ -150,11 +151,11 @@ export default class MagicEdenModule extends ModuleBase {
                         this.buyNFT();
                     }
                 }).catch((e) => {
-                    LogEmitter.log(this, e.message);
+                    console.log(chalk.yellow(e.message));
                 });
             }
             catch(err) {
-                LogEmitter.log(this, err.message);
+                console.log(chalk.red(err.message));
             }
         }
     }
@@ -192,10 +193,10 @@ export default class MagicEdenModule extends ModuleBase {
                         this.getAndSendTX(TXData);
                     }
                 }).catch((e) => {
-                    LogEmitter.log(this, "Error buying NFT: " + e.message);
+                    console.log(chalk.red("Error buying NFT: " + e.message));
                 });
             } catch(err){
-                LogEmitter.log(this, "Error buying NFT: " + err.message);
+                console.log(chalk.red("Error buying NFT: " + err.message));
             }
         }
     }
@@ -213,10 +214,10 @@ export default class MagicEdenModule extends ModuleBase {
                 var TXN = TX.serialize();
                 let finalTX = await this.SOLANA_CLIENT.sendRawTransaction(TXN);
                 
-                LogEmitter.log(this, 'Successfully bought NFT, TX: ' + finalTX);
+                console.log(chalk.greenBright('Successfully bought NFT, TX: ' + finalTX));
                 this.checkTX(finalTX);
             } catch(err) {
-                LogEmitter.log(this, err.message);
+                console.log(chalk.red(err.message));
                 if (err.message.includes('Blockhash not found')) {
                     setTimeout(this.buyNFT.bind(this), 3000);
                 }
@@ -272,20 +273,20 @@ export default class MagicEdenModule extends ModuleBase {
                         }, 3000);
                     }
                     else if (json.result.meta.err === null) {
-                        LogEmitter.log(this, 'Successfully sniped!')
+                        console.log(chalk.greenBright('Successfully sniped!'))
                     //console.log('NFT Data: ' + nft_info.nft_info.name + ' ' + nft_info.nft_info.price + ' ' + nft_info.nft_info.image + ' ' + nft_info.nft_info.url)
                     } else {
-                        LogEmitter.log(this, "CheckTX result error: " + json.result.err);
+                        console.log(chalk.yellow("CheckTX result error: " + json.result.err));
                         //LogEmitter.log(this, json.result.err);
                     }
                 }).catch((e) => {
-                    LogEmitter.log(this, "CheckTX error: " + e.message);
+                    console.log(chalk.red("CheckTX error: " + e.message));
                     setTimeout(function () {
                         this.checkTX(TX).bind(this);
                     }, 3000);
                 });
             } catch(err) {
-                LogEmitter.log(this, err.message)
+                console.log(chalk.red(err.message))
             }
         }
     }

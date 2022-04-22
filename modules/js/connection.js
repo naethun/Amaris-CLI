@@ -43,6 +43,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
+import chalk from "chalk";
 import { Transaction, } from '@solana/web3.js';
 export var getErrorForTransaction = function (connection, txid) { return __awaiter(void 0, void 0, void 0, function () {
     var tx, errors;
@@ -185,7 +186,7 @@ export var sendTransactions = function (connection, wallet, instructionSet, sign
                     signedTxns = _b.sent();
                     pendingTxns = [];
                     breakEarlyObject = { breakEarly: false, i: 0 };
-                    console.log('Signed txns length', signedTxns.length, 'vs handed in length', instructionSet.length);
+                    console.log(chalk.green('Signed', signedTxns.length, 'tx out of', instructionSet.length));
                     _loop_2 = function (i) {
                         var signedTxnPromise, e_2, _c;
                         var _d;
@@ -398,7 +399,7 @@ export function sendSignedTransaction(_a) {
                         })];
                 case 1:
                     txid = _c.sent();
-                    console.log('Started awaiting confirmation for', txid);
+                    console.log(chalk.yellow('Waiting for connection to', txid));
                     done = false;
                     (function () { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
@@ -432,9 +433,9 @@ export function sendSignedTransaction(_a) {
                     return [3 /*break*/, 10];
                 case 4:
                     err_1 = _c.sent();
-                    console.error('Timeout Error caught', err_1);
+                    console.error(chalk.redBright('Timeout error caught'));
                     if (err_1.timeout) {
-                        throw new Error('Timed out awaiting confirmation on transaction');
+                        console.log(chalk.redBright('Timed out awaiting confirmation on transaction'));
                     }
                     simulateResult = null;
                     _c.label = 5;
@@ -453,18 +454,19 @@ export function sendSignedTransaction(_a) {
                             for (i = simulateResult.logs.length - 1; i >= 0; --i) {
                                 line = simulateResult.logs[i];
                                 if (line.startsWith('Program log: ')) {
-                                    throw new Error('Transaction failed: ' + line.slice('Program log: '.length));
+                                    console.log(chalk.red('Transaction failed because of connection, restart your task'));
                                 }
                             }
                         }
-                        throw new Error(JSON.stringify(simulateResult.err));
+                        //throw new Error(JSON.stringify(simulateResult.err));
                     }
                     return [3 /*break*/, 10];
                 case 9:
                     done = true;
                     return [7 /*endfinally*/];
                 case 10:
-                    console.log('Latency', txid, getUnixTs() - startTime);
+                    console.log(chalk.redBright('Failed TX id:'), txid) 
+                    console.log(chalk.redBright('Task time (secs):' , getUnixTs() - startTime));
                     return [2 /*return*/, { txid: txid, slot: slot }];
             }
         });
@@ -526,7 +528,7 @@ function awaitTransactionSignatureConfirmation(txid, timeout, connection, commit
                                                 return;
                                             }
                                             done = true;
-                                            console.log('Rejecting for timeout...');
+                                            console.log(chalk.red('Receiving a timeout...'));
                                             reject({ timeout: true });
                                         }, timeout);
                                         try {
@@ -538,7 +540,7 @@ function awaitTransactionSignatureConfirmation(txid, timeout, connection, commit
                                                     confirmations: 0
                                                 };
                                                 if (result.err) {
-                                                    console.log('Rejected via websocket', result.err);
+                                                    //console.log(chalk.bgRed('Rejected via websocket'));
                                                     reject(status);
                                                 }
                                                 else {
@@ -561,8 +563,8 @@ function awaitTransactionSignatureConfirmation(txid, timeout, connection, commit
                                                 switch (_a.label) {
                                                     case 0:
                                                         _a.trys.push([0, 2, , 3]);
-                                                        console.log("status1");
-                                                        console.log(txid);
+                                                        console.log(chalk.yellow("Running..."));
+                                                        console.log(chalk.greenBright("Possible TXID: " + txid));
                                                         return [4 /*yield*/, connection.getSignatureStatuses([
                                                                 txid,
                                                             ])];
@@ -571,18 +573,18 @@ function awaitTransactionSignatureConfirmation(txid, timeout, connection, commit
                                                         status = signatureStatuses && signatureStatuses.value[0];
                                                         if (!done) {
                                                             if (!status) {
-                                                                console.log('REST null result for', txid, status);
+                                                                //console.log('REST null result for', txid, status);
                                                             }
                                                             else if (status.err) {
-                                                                console.log('REST error for', txid, status.err);
+                                                                //console.log('REST error for', txid, status.err);
                                                                 done = true;
                                                                 reject(status.err);
                                                             }
                                                             else if (!status.confirmations) {
-                                                                console.log('REST no confirmations for', txid, status);
+                                                                //console.log('REST no confirmations for', txid, status);
                                                             }
                                                             else {
-                                                                console.log('REST confirmation for', txid, status);
+                                                                //console.log('REST confirmation for', txid, status);
                                                                 done = true;
                                                                 resolve(status);
                                                             }
@@ -591,7 +593,7 @@ function awaitTransactionSignatureConfirmation(txid, timeout, connection, commit
                                                     case 2:
                                                         e_4 = _a.sent();
                                                         if (!done) {
-                                                            console.log('REST connection error: txid', txid, e_4);
+                                                            //console.log('REST connection error: txid', txid, e_4);
                                                         }
                                                         return [3 /*break*/, 3];
                                                     case 3: return [2 /*return*/];

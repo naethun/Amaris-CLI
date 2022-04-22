@@ -50,7 +50,7 @@ var NodeWallet = /** @class */ (function () {
     }
     NodeWallet.local = function (secret) {
         var process = require("process");
-        console.log("key eti", secret);
+        //console.log("key eti", secret);
         var payer = web3_js_1.Keypair.fromSecretKey(buffer_1.Buffer.from(secret));
         return new NodeWallet(payer);
     };

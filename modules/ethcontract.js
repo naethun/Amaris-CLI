@@ -6,6 +6,7 @@ import fs from 'fs';
 
 import { LogEmitter } from "../libs/log.js";
 import { ModuleBase } from "./module_base.js";
+import chalk from "chalk";
 
 export default class EthContract extends ModuleBase {
       getContractAbi = ( function(contract) {
@@ -27,9 +28,10 @@ export default class EthContract extends ModuleBase {
             this.GAS_PRICE = data.gas_price;
             this.PRICE = data.price;
             this.VALID_DATA = true;
+            console.log(chalk.green('Pulling the data...'))
         }
         catch(e) {
-            LogEmitter.log(this, e.message);
+            console.log(chalk.red(this, e.message));
             this.VALID_DATA = false;
         }
     }
@@ -41,10 +43,10 @@ export default class EthContract extends ModuleBase {
                 //let rawdata = fs.readFileSync('../config/ethcontract.json'); // read data
                 //let input = JSON.parse(rawdata);// put parsed json data into here
                 if(contract_address = null){
-                  LogEmitter.log( this, "Error with contract address!" );
+                  console.log(chalk.red("Error with contract address!" ));
                 }
                 if(SmartContract = null){
-                  LogEmitter.log( this, "Error with Smart Contract!" );
+                  console.log(chalk.red("Error with Smart Contract!" ));
                 }
 
                  await this.getContractAbi(this.CONTRACT_ADDRESS).then ( async (abi) => {
@@ -81,10 +83,10 @@ export default class EthContract extends ModuleBase {
                       from: address,
                       value: (parseInt(_apep)).toString(),
                     }))
-                    LogEmitter.log( this, "Successfully minted!" );
+                    console.log(chalk.green("Successfully minted!"));
                 })
             } catch {
-                LogEmitter.log(this, "Error with mint! Please check your inputs." );
+                console.log(chalk.red("Error with mint! Please check your inputs." ));
             }
         }
       }

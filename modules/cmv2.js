@@ -3,6 +3,7 @@ import { ModuleBase } from "./module_base.js";
 
 import * as web3 from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
+import chalk from "chalk";
 
 import {
     awaitTransactionSignatureConfirmation,
@@ -40,7 +41,7 @@ class CMV2Mint extends ModuleBase {
         if (this.isRunning()) {
             if (this.VALID_DATA) {
                 try {
-                    LogEmitter.log(this, "Task loaded.")
+                    LogEmitter.log(this, chalk.yellow("Task loaded."))
                     this.cop(this.PRIVATE_KEY, this.CMID, this.RPC);
                 } catch {
                     LogEmitter.log(this, "Error, couldnt load task.")
@@ -58,12 +59,10 @@ class CMV2Mint extends ModuleBase {
         }
     }
 
-
-
-
-
     async cop(privateKey, cm, rpc) {
         try {
+            var loop = 0
+
             function createConnection(rpc) { // local function as it isn't needed anywhere else
                 return new web3.Connection(rpc, 'confirmed');
             }
@@ -74,34 +73,46 @@ class CMV2Mint extends ModuleBase {
             const prv = privateKey; //parse json
             const id = cm; //parse json
 
-            console.log("Converted Array")
+            console.log(
+                chalk.yellow(" Reading the private key.")
+            )
+
             const bin = base58_to_binary(prv)
-
-            console.log(bin);
-
 
             const candyMachineId = new anchor.web3.PublicKey(
                 id,
             );
 
             const wallet = NodeWallet.local(bin);
-            console.log(`Public Key: `, wallet.publicKey)
+            console.log(
+                chalk.yellow("Found public key.")
+            )
 
             let balanace = await this.connection.getBalance(wallet.publicKey);
 
-            console.log(balanace);
+            console.log(chalk.yellow("Using Candy Machine ID. " , id));
+
             const cndy = await getCandyMachineState(
                 wallet,
                 candyMachineId,
                 this.connection,
+                console.log(chalk.greenBright("Initalizing transaction for mint!"))
             );
 
             const mintTxId = (
-                await mintOneToken(cndy, wallet.publicKey)
-            )[0];
+                await mintOneToken(
+                    cndy, 
+                    wallet.publicKey, 
+                    console.log(chalk.greenBright("Minting...")))
+            ) [0];
 
-            console.log(`Successfully Minted with: `, mintTxId);
-            let statuses = { err: true };
+            if(mintTxId = undefined){
+                console.log(chalk.bgRed("Minting failed. Please restart your task"))
+            } else {
+                console.log(chalk.bgGreen(`Successfully minted! Transaction id: `, mintTxId));
+            }
+
+            let statuses = { err: false };
 
             if (mintTxId) {
                 statuses = await awaitTransactionSignatureConfirmation(
@@ -115,7 +126,7 @@ class CMV2Mint extends ModuleBase {
             }
 
         } catch (e) {
-            console.log(e);
+            console.log(chalk.redBright("Error connecting, please restart your task."));
         }
 
     }
