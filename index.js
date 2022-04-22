@@ -2,6 +2,8 @@ import inquirer from "inquirer";
 import fs from "fs";
 import fetch from 'node-fetch';
 import setTitle from "node-bash-title";
+import rpc from "discord-rpc";
+const client = new rpc.Client({ transport: 'ipc' })
 setTitle('Amaris AIO');
 
 import { CSVParser } from "./libs/csv.js";
@@ -40,7 +42,6 @@ console.log(chalk.blueBright(`
                          
 `));
 
-
 const init = async () => {
     modules = JSON.parse(fs.readFileSync("./modules.json"));
     var rawdata = fs.readFileSync('./auth.json');
@@ -51,7 +52,7 @@ const init = async () => {
     const options = {
         method: "GET",
         headers: {
-            "Authorization": "Bearer MTE2OWEzMzE4MWQ1Mzc1NTg3MzVhZDM3YWU0MjdjZTZjYTU3ZTdhMmU4OmI3Y2UzNGE2NTc4MGYzNjZhMDA0NDIzMjhmYjA5N2FjMmRjNjY4YjE2ZQ=="
+            "Authorization": "Bearer NmNiNjJjMjlmODNmNzc3N2IwZWNjZjg0MTBkMGYxZTg1OWFlYmEwMDAwOmE1OTMwMDNhZjQyZjZlZGIyZTE5NGIwNmE3MTE1N2QyMTY4MTIxMjI5OQ=="
         }
     };
     fetch(`https://api.whop.io/api/v1/licenses/${key.key}`, options)
@@ -60,7 +61,7 @@ const init = async () => {
             return response.json();
         }
         else{
-            console.log("Key is not detected.")
+            console.log("Key is not detected in our database. Please retry.")
         }
     })
     .then((json) => {
@@ -76,6 +77,21 @@ const init = async () => {
 }
 
 const startMenu = () => {
+    client.login({ clientId : '958506386562621450' }).catch(console.error); 
+
+    client.on('ready', () => {
+        client.request('SET_ACTIVITY', {
+            pid: process.pid,
+            activity: {
+                details: 'Beta v0.1',
+                state: "Automating the blockchain",
+                assets: {
+                     large_image: 'unknown',
+                }
+            }
+        })
+    });
+
     global.prompt = inquirer.prompt([
         {
             type:"list",
@@ -88,14 +104,14 @@ const startMenu = () => {
         {
             type:"list",
             name:"run_mode",
-            message:"Choose a running method: ",
+            message:"Choose which method you would like to use: ",
             choices: [
                 {
-                    name:"Pre-Saved Input",
+                    name:"Pre-Saved Task",
                     value:"presaved"
                 },
                 {
-                    name:"Manual Input",
+                    name:"Manual Task",
                     value:"manualtask"
                 }
             ],
