@@ -26,13 +26,13 @@
 ::ZQ0/vhVqMQ3MEVWAtB9wSA==
 ::Zg8zqx1/OA3MEVWAtB9wSA==
 ::dhA7pRFwIByZRRnk
-::Zh4grVQjdCyDJGyX8VAjFBVVWBaDAE+1EbsQ5+n//Namr0wPXfF/Wab0lLGWJYA=
+::Zh4grVQjdCyDJGyX8VAjFBVVWBaDAE+/Fb4I5/jH7OaOnmwQVfA2a8/11bCLYNAS/kbscIRj02Jf+A==
 ::YB416Ek+ZG8=
 ::
 ::
 ::978f952a14a936cc963da21a135fa983
 @echo off
-title Amaris CLI
+title Amaris Node Patcher
 :x
-node index.js
+npm install
 goto x;

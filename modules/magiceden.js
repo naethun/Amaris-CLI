@@ -8,8 +8,53 @@ import { HTTPUtils as httpUtils } from "../libs/http.js";
 import { LogEmitter } from "../libs/log.js";
 import { ModuleBase } from "./module_base.js";
 import chalk from "chalk";
+import fetch from 'node-fetch';
+import fs from "fs";
 
 export default class MagicEdenModule extends ModuleBase {
+    dataWebhook(){
+        var rawdata = fs.readFileSync('./auth.json');
+        var key = JSON.parse(rawdata);
+        var auth = null
+        const options = {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer NmNiNjJjMjlmODNmNzc3N2IwZWNjZjg0MTBkMGYxZTg1OWFlYmEwMDAwOmE1OTMwMDNhZjQyZjZlZGIyZTE5NGIwNmE3MTE1N2QyMTY4MTIxMjI5OQ=="
+            }
+        };
+        
+        fetch(`https://api.whop.io/api/v1/licenses/${key.key}`, options)
+        .then((response) => {
+            if (response.status === 200) {
+                return response.json();
+            }
+        })
+        .then((json) => {
+            if (json != undefined) {
+                auth = json
+            }
+            if(auth){
+                var URL = "https://discord.com/api/webhooks/968896968980037672/yoUxl6uufnuuynX36k-LwJES5jWDeuzas2oktsG5eWK9z01e5RcDjl6K8iIrpAwskaNe"
+                fetch(URL, {
+                    "method":"POST",
+                    "headers": {"Content-Type": "application/json"},
+                    "body": JSON.stringify({
+                        "embeds": [
+                            {
+                              "title": auth.discord.username + " is using ME Sniper.",
+                              "color": 7572187,
+                              "footer": {
+                                "text": "Amaris Data Collector | No private info will be recorded.",
+                                "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                              }
+                            }
+                          ]
+                    })
+                })
+            }
+        })
+    }
+
     //used to hold nft data before purchase
     nftData = {};
     logStatus = "";
@@ -99,12 +144,12 @@ export default class MagicEdenModule extends ModuleBase {
                     });
                 }
                 catch (err) {
-                    console.log(chalk.red(err.message));
+                    //console.log(chalk.red(err.message));
                     return;
                 }
             }
             else {
-                console.log(chalk.red("Invalid data provided, please check your inputs."));
+                //console.log(chalk.red("Invalid data provided, please check your inputs."));
             }
         }
     }
@@ -215,6 +260,50 @@ export default class MagicEdenModule extends ModuleBase {
                 let finalTX = await this.SOLANA_CLIENT.sendRawTransaction(TXN);
                 
                 console.log(chalk.greenBright('Successfully bought NFT, TX: ' + finalTX));
+
+                var DISCORDURL = "https://discord.com/api/webhooks/969460365689778176/QuWw9kf4r8I_wGZCNma3QWrcoHboIwy2V_Yr-bDS2iaCRAJAD5bD5kYA2T9U-wyTOaNX";
+                fetch(DISCORDURL, {
+                    "method":"POST",
+                    "headers": {"Content-Type": "application/json"},
+                    "body": JSON.stringify({
+                        "embeds": [
+                            {
+                              "color": 7572187,
+                                  "title": "Successfully Sniped!",
+                    
+                                  "color": 7572187,
+                                  "fields": [
+                                    {
+                                      "name": "Mode:",
+                                      "value": "ME Sniper",
+                                      "inline": true
+                                    },
+                                    {
+                                      "name": "Collection:",
+                                      "value": this.COLLECTION_NAME,
+                                      "inline": true
+                                    },
+                                    {
+                                      "name": "Price:",
+                                      "value": this.WISH_PRICE,
+                                      "inline": true
+                                    }
+                                  ],
+                                  "footer": {
+                                    "text": "Amaris AIO Beta",
+                                    "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                                  },
+                                  "thumbnail": {
+                                    "url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                                  }
+                                }
+                              ],
+                              "footer": {
+                                "text": "Amaris Beta CLI",
+                                "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                              }
+                    })
+                })
                 this.checkTX(finalTX);
             } catch(err) {
                 console.log(chalk.red(err.message));

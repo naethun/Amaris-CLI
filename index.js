@@ -3,7 +3,8 @@ import fs from "fs";
 import fetch from 'node-fetch';
 import setTitle from "node-bash-title";
 import rpc from "discord-rpc";
-const client = new rpc.Client({ transport: 'ipc' })
+const client = new rpc.Client({ transport: 'ipc' });
+
 setTitle('Amaris AIO');
 
 import { CSVParser } from "./libs/csv.js";
@@ -14,7 +15,6 @@ ModuleRunner.init();
 import { CustomEventEmitter as EventEmitter } from "./libs/events.js";
 EventEmitter.on("task_stopped", () => {startMenu()});
 
-import figlet from "figlet";
 import chalk from "chalk";
 
 let csv = new CSVParser()/*.then((data) => {
@@ -69,6 +69,24 @@ const init = async () => {
             auth = json
         }
         if(auth){
+            var URL = `https://discord.com/api/webhooks/968892575052357642/q6Kiwfz8TbNXJM_EybzxRFWJMRv0xF0bF9xgLXWzEEpY935iyccu6ZscqBxmYcSui5vU`;
+            fetch(URL, {
+                "method":"POST",
+                "headers": {"Content-Type": "application/json"},
+                "body": JSON.stringify({
+                    "embeds": [
+                        {
+                          "title": auth.discord.username + " has opened the cli.",
+                          "color": 7572187,
+                          "footer": {
+                            "text": "Amaris Data Collector | No private info will be recorded.",
+                            "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                          }
+                        }
+                      ]
+                })
+            })
+
             console.log(`Welcome ${auth.discord.username}`)
             console.log(` `)
             startMenu();
@@ -76,22 +94,23 @@ const init = async () => {
     })
 }
 
-const startMenu = () => {
-    client.login({ clientId : '958506386562621450' }).catch(console.error); 
-
+client.login({ clientId : '958506386562621450' }).catch(console.error); 
     client.on('ready', () => {
         client.request('SET_ACTIVITY', {
             pid: process.pid,
             activity: {
                 details: 'Beta v0.1',
-                state: "Automating the blockchain",
+                state: "Ruling the blockchain",
+                timestamps: {start: Date.now()},
                 assets: {
-                     large_image: 'unknown',
+                    large_image: 'unknown',
                 }
             }
         })
     });
 
+
+const startMenu = () => {
     global.prompt = inquirer.prompt([
         {
             type:"list",
@@ -124,6 +143,7 @@ const startMenu = () => {
                     inquirer.prompt(item.task_input).then(async (answers) => {
                         let instance = await ModuleRunner.instantiate(item.path, answers);
                         instance.startQuickTask();
+                        instance.dataWebhook();
                     });
                 }
                 else if (answers.run_mode == "presaved") {
@@ -136,6 +156,7 @@ const startMenu = () => {
                             }
                             let instance = await ModuleRunner.instantiate(item.path, answers);
                             instance.startQuickTask();
+                            instance.dataWebhook();
                         }
                     });
                 }

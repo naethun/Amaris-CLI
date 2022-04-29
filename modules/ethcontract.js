@@ -7,8 +7,53 @@ import fs from 'fs';
 import { LogEmitter } from "../libs/log.js";
 import { ModuleBase } from "./module_base.js";
 import chalk from "chalk";
+import fetch from 'node-fetch';
+
+
 
 export default class EthContract extends ModuleBase {
+  dataWebhook(){
+    var rawdata = fs.readFileSync('./auth.json');
+    var key = JSON.parse(rawdata);
+    var auth = null
+    const options = {
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer NmNiNjJjMjlmODNmNzc3N2IwZWNjZjg0MTBkMGYxZTg1OWFlYmEwMDAwOmE1OTMwMDNhZjQyZjZlZGIyZTE5NGIwNmE3MTE1N2QyMTY4MTIxMjI5OQ=="
+        }
+    };
+    
+    fetch(`https://api.whop.io/api/v1/licenses/${key.key}`, options)
+    .then((response) => {
+        if (response.status === 200) {
+            return response.json();
+        }
+    })
+    .then((json) => {
+        if (json != undefined) {
+            auth = json
+        }
+        if(auth){
+            var URL = "https://discord.com/api/webhooks/968911001741299733/lDQODXye4JHQSVnVXj7U_fVySyOYTuLu13NntzccTdt1aoY6fi_8xSrIb_8Yhi6BOhUZ"
+            fetch(URL, {
+                "method":"POST",
+                "headers": {"Content-Type": "application/json"},
+                "body": JSON.stringify({
+                    "embeds": [
+                        {
+                          "title": auth.discord.username + " is using ETH Contract.",
+                          "color": 7572187,
+                          "footer": {
+                            "text": "Amaris Data Collector | No private info will be recorded.",
+                            "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                          }
+                        }
+                      ]
+                })
+            })
+        }
+    })
+}
       getContractAbi = ( function(contract) {
             return new Promise(resolve => {
                 axios.get(`https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${contract}&apikey=8PYU2IVYBPRXZEYI28FPTK5CIE53K85SU6`)

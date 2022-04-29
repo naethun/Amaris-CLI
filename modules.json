@@ -32,7 +32,7 @@
         "type":"ETHCONTRACT",
         "name":"ETH Contract Mint",
         "path":"ethcontract.js",
-        "config":"ethcontract.json",
+        "config":"ethcontract.csv",
         "config_map":["contract_address","function_name","private_key","gas_price", "price"],
         "task_input":[
             {
