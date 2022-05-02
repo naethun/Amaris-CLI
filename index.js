@@ -132,6 +132,10 @@ const startMenu = () => {
                 {
                     name:"Manual Task",
                     value:"manualtask"
+                },
+                {
+                    name: "Settings",
+                    value: "settings"
                 }
             ],
             default:"manualtask"
@@ -159,6 +163,39 @@ const startMenu = () => {
                             instance.dataWebhook();
                         }
                     });
+                } else if (answers.run_mode == "settings"){
+                    inquirer.prompt([
+                        {
+                            type:"list",
+                            name:"settings",
+                            message:"What would you like to check? ",
+                            choices:
+                            [
+                                {
+                                    name: "SOL Balance Check",
+                                    value: "solbalance"
+                                }
+                            ]
+                        }
+                    ]).then((answers) => {
+                        let check = false; 
+                        if(answers.settings == "solbalance"){
+                            
+                            const clearLastLine = () => { //clear line function
+                                process.stdout.moveCursor(0, -3) // up one line
+                                process.stdout.clearLine(1) // from cursor to end
+                              }
+
+                            check = true;
+
+                            // add a then to run code and IF code worked then run the start menu over again.
+                            
+                            if (check = true ){
+                                clearLastLine();
+                                startMenu();
+                            }
+                        }
+                    })
                 }
                 return item;
             }
