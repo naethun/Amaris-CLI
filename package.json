@@ -26,6 +26,7 @@
     "inquirer": "^8.2.1",
     "node-bash-title": "^0.0.2",
     "node-fetch": "^3.2.3",
+    "theblockchainapi": "^1.0.9391",
     "web3": "^1.7.3"
   }
 }

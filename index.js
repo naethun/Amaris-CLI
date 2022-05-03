@@ -1,14 +1,11 @@
 import inquirer from "inquirer";
 import fs from "fs";
 import fetch from 'node-fetch';
-import setTitle from "node-bash-title";
 import rpc from "discord-rpc";
 const client = new rpc.Client({ transport: 'ipc' });
 
-setTitle('Amaris AIO');
-
 import { CSVParser } from "./libs/csv.js";
-
+import { balanceCheck } from './settings/solcheck.js'
 import { ModuleRunner } from "./libs/module_runner.js";
 ModuleRunner.init();
 
@@ -138,7 +135,7 @@ const startMenu = () => {
                     value: "settings"
                 }
             ],
-            default:"manualtask"
+            default:"presaved"
         },
     ]).then((answers) => {
         modules.map((item) => {
@@ -178,21 +175,20 @@ const startMenu = () => {
                             ]
                         }
                     ]).then((answers) => {
-                        let check = false; 
                         if(answers.settings == "solbalance"){
-                            
-                            const clearLastLine = () => { //clear line function
-                                process.stdout.moveCursor(0, -3) // up one line
-                                process.stdout.clearLine(1) // from cursor to end
+                            let check = false;
+                            const clearLastLine = () => {
+                                process.stdout.moveCursor(0, -4)
+                                process.stdout.clearLine(1)
                               }
 
-                            check = true;
-
-                            // add a then to run code and IF code worked then run the start menu over again.
+                            balanceCheck();
                             
                             if (check = true ){
-                                clearLastLine();
-                                startMenu();
+                                setTimeout(() => {
+                                    clearLastLine();
+                                    startMenu();
+                                }, 1000);
                             }
                         }
                     })
