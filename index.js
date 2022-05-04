@@ -3,9 +3,8 @@ import fs from "fs";
 import fetch from 'node-fetch';
 import rpc from "discord-rpc";
 const client = new rpc.Client({ transport: 'ipc' });
-
+import theblockchainapi from 'theblockchainapi';
 import { CSVParser } from "./libs/csv.js";
-import { balanceCheck } from './settings/solcheck.js'
 import { ModuleRunner } from "./libs/module_runner.js";
 ModuleRunner.init();
 
@@ -14,37 +13,25 @@ EventEmitter.on("task_stopped", () => {startMenu()});
 
 import chalk from "chalk";
 
-let csv = new CSVParser()/*.then((data) => {
-    console.log("asdasdas");
-}).catch((e) => {
-    console.log("21321321");
-});*/
+let defaultClient = theblockchainapi.ApiClient.instance;
+
+let APIKeyID = defaultClient.authentications['APIKeyID'];
+APIKeyID.apiKey = 'UYGlEprUnMGV41f';
+
+let APISecretKey = defaultClient.authentications['APISecretKey'];
+APISecretKey.apiKey = 'Cb9XpBZwqtHq5lQ';
+
+let apiInstance = new theblockchainapi.SolanaWalletApi();
+
+let csv = new CSVParser()
 let modules;
-
-/*process.on('SIGINT', () => {
-    ModuleRunner.destroyAll();
-});*/
-
-console.log(chalk.blueBright(`
-
-   ▄████████    ▄▄▄▄███▄▄▄▄      ▄████████    ▄████████  ▄█     ▄████████         ▄████████  ▄█   ▄██████▄  
-  ███    ███  ▄██▀▀▀███▀▀▀██▄   ███    ███   ███    ███ ███    ███    ███        ███    ███ ███  ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███   ███    ███ ███▌   ███    █▀         ███    ███ ███▌ ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███  ▄███▄▄▄▄██▀ ███▌   ███               ███    ███ ███▌ ███    ███ 
-▀███████████  ███   ███   ███ ▀███████████ ▀▀███▀▀▀▀▀   ███▌ ▀███████████      ▀███████████ ███▌ ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███ ▀███████████ ███           ███        ███    ███ ███  ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███   ███    ███ ███     ▄█    ███        ███    ███ ███  ███    ███ 
-  ███    █▀    ▀█   ███   █▀    ███    █▀    ███    ███ █▀    ▄████████▀         ███    █▀  █▀    ▀██████▀  
-                                             ███    ███                                                     
-                         
-`));
 
 const init = async () => {
     modules = JSON.parse(fs.readFileSync("./modules.json"));
     var rawdata = fs.readFileSync('./auth.json');
     var key = JSON.parse(rawdata);
 
-    var auth = null
+    var auth = null;
     
     const options = {
         method: "GET",
@@ -83,6 +70,20 @@ const init = async () => {
                       ]
                 })
             })
+
+            console.log(chalk.blueBright(`
+
+            ▄████████    ▄▄▄▄███▄▄▄▄      ▄████████    ▄████████  ▄█     ▄████████         ▄████████  ▄█   ▄██████▄  
+           ███    ███  ▄██▀▀▀███▀▀▀██▄   ███    ███   ███    ███ ███    ███    ███        ███    ███ ███  ███    ███ 
+           ███    ███  ███   ███   ███   ███    ███   ███    ███ ███▌   ███    █▀         ███    ███ ███▌ ███    ███ 
+           ███    ███  ███   ███   ███   ███    ███  ▄███▄▄▄▄██▀ ███▌   ███               ███    ███ ███▌ ███    ███ 
+         ▀███████████  ███   ███   ███ ▀███████████ ▀▀███▀▀▀▀▀   ███▌ ▀███████████      ▀███████████ ███▌ ███    ███ 
+           ███    ███  ███   ███   ███   ███    ███ ▀███████████ ███           ███        ███    ███ ███  ███    ███ 
+           ███    ███  ███   ███   ███   ███    ███   ███    ███ ███     ▄█    ███        ███    ███ ███  ███    ███ 
+           ███    █▀    ▀█   ███   █▀    ███    █▀    ███    ███ █▀    ▄████████▀         ███    █▀  █▀    ▀██████▀  
+                                                      ███    ███                                                     
+                                  
+            `));
 
             console.log(`Welcome ${auth.discord.username}`)
             console.log(` `)
@@ -171,25 +172,88 @@ const startMenu = () => {
                                 {
                                     name: "SOL Balance Check",
                                     value: "solbalance"
+                                },
+                                {
+                                    name: "SOL Transfer between wallets",
+                                    value: "solTransfer"
                                 }
                             ]
                         }
                     ]).then((answers) => {
+                        if (answers.settings == "solTransfer"){
+                            inquirer.prompt([
+                                {
+                                    type:"input",
+                                    choices:
+                                    [
+                                        {
+                                            name: "Secret key:",
+                                            value: "secKey"
+                                        },
+                                        {
+                                            name: "Public address you want to send to:",
+                                            value: "pubKeyTransfer"
+                                        }
+                                    ]
+                                }
+                            ]).then((answers) => {
+                                
+                            })
+                        }
                         if(answers.settings == "solbalance"){
-                            let check = false;
-                            const clearLastLine = () => {
-                                process.stdout.moveCursor(0, -4)
-                                process.stdout.clearLine(1)
-                              }
+                            inquirer.prompt([
+                                {
+                                    type:"input",
+                                    name:"solBalance",
+                                    message:"Please input the wallet public address: ",
+                                    choices:
+                                    [
+                                        {
+                                            name: "Public address:",
+                                            value: "pubkeyInput"
+                                        }
+                                    ]
+                                }
+                            ]).then((answers) => {
+                                let check = false;
 
-                            balanceCheck();
-                            
-                            if (check = true ){
-                                setTimeout(() => {
-                                    clearLastLine();
-                                    startMenu();
-                                }, 1000);
-                            }
+                                async function balanceCheck(){
+                                    let check;
+                                    check = true;
+                                
+                                    const balance_request = new theblockchainapi.BalanceRequest(); // BalanceRequest | 
+                                    balance_request.public_key = answers.pubkeyInput;
+                                    balance_request.network = 'mainnet-beta';
+                                    balance_request.unit = 'sol';
+                                    
+                                    let opts = {
+                                      'balanceRequest': balance_request
+                                    };
+                                    
+                                    let balance_result = 
+                                       await apiInstance.solanaGetBalance(opts)
+                                        .then((data) => {
+                                          chalk.yellow(console.log('Finding the balance...'));
+                                          return data;
+                                        }, 
+                                        (error) => {
+                                          console.error(error);
+                                          return error;
+                                        });
+                                    
+                                      
+                                    chalk.green(console.log("SOL Balance: ", balance_result.balance));
+                                }
+
+                                balanceCheck();
+
+                                if(check = true){
+                                    setTimeout(() => {
+                                        console.clear();
+                                        init();
+                                    }, 2000);
+                                }
+                            })
                         }
                     })
                 }
