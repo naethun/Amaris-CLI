@@ -1,21 +1,23 @@
 import inquirer from "inquirer";
 import fs from "fs";
 import fetch from 'node-fetch';
-import axios from "axios";
+import chalk from "chalk";
 
 import rpc from "discord-rpc";
 const client = new rpc.Client({ transport: 'ipc' });
 
-import theblockchainapi from 'theblockchainapi';
 import { CSVParser } from "./libs/csv.js";
+let csv = new CSVParser()
+
 import { ModuleRunner } from "./libs/module_runner.js";
 ModuleRunner.init();
 
 import { CustomEventEmitter as EventEmitter } from "./libs/events.js";
-EventEmitter.on("task_stopped", () => {startMenu()});
+EventEmitter.on("task_stopped", () => {
+    startMenu()
+});
 
-import chalk from "chalk";
-
+import theblockchainapi from 'theblockchainapi';
 let defaultClient = theblockchainapi.ApiClient.instance;
 
 let APIKeyID = defaultClient.authentications['APIKeyID'];
@@ -26,7 +28,6 @@ APISecretKey.apiKey = 'Cb9XpBZwqtHq5lQ';
 
 let apiInstance = new theblockchainapi.SolanaWalletApi();
 
-let csv = new CSVParser()
 let modules;
 
 const init = async () => {
@@ -130,48 +131,24 @@ const init = async () => {
                     init();
                 }
             })
-            .then((json) => {
-                if (json != undefined) {
-                    auth = json
-                }
-                if(auth){
-                    var URL = `https://discord.com/api/webhooks/968892575052357642/q6Kiwfz8TbNXJM_EybzxRFWJMRv0xF0bF9xgLXWzEEpY935iyccu6ZscqBxmYcSui5vU`;
-                    fetch(URL, {
-                        "method":"POST",
-                        "headers": {"Content-Type": "application/json"},
-                        "body": JSON.stringify({
-                            "embeds": [
-                                {
-                                  "title": auth.discord.username + " has opened the cli.",
-                                  "color": 7572187,
-                                  "footer": {
-                                    "text": "Amaris Data Collector | No private info will be recorded.",
-                                    "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
-                                  }
-                                }
-                              ]
-                        })
-                    })
-        
-                    console.log(chalk.blueBright(`
-    
-  ▄████████    ▄▄▄▄███▄▄▄▄      ▄████████    ▄████████  ▄█     ▄████████         ▄████████  ▄█   ▄██████▄  
-  ███    ███  ▄██▀▀▀███▀▀▀██▄   ███    ███   ███    ███ ███    ███    ███        ███    ███ ███  ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███   ███    ███ ███▌   ███    █▀         ███    ███ ███▌ ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███  ▄███▄▄▄▄██▀ ███▌   ███               ███    ███ ███▌ ███    ███ 
-▀███████████  ███   ███   ███ ▀███████████ ▀▀███▀▀▀▀▀   ███▌ ▀███████████      ▀███████████ ███▌ ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███ ▀███████████ ███           ███        ███    ███ ███  ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███   ███    ███ ███     ▄█    ███        ███    ███ ███  ███    ███ 
-  ███    █▀    ▀█   ███   █▀    ███    █▀    ███    ███ █▀    ▄████████▀         ███    █▀  █▀    ▀██████▀  
-                                             ███    ███                                                     
-                                                        
-                                  `));
-        
-                    console.log(`Welcome ${auth.discord.username}`)
-                    console.log(` `)
-                    startMenu();
-                }
-            })
+
+            console.log(chalk.blueBright(`
+
+    ▄████████    ▄▄▄▄███▄▄▄▄      ▄████████    ▄████████  ▄█     ▄████████         ▄████████  ▄█   ▄██████▄  
+   ███    ███  ▄██▀▀▀███▀▀▀██▄   ███    ███   ███    ███ ███    ███    ███        ███    ███ ███  ███    ███ 
+   ███    ███  ███   ███   ███   ███    ███   ███    ███ ███▌   ███    █▀         ███    ███ ███▌ ███    ███ 
+   ███    ███  ███   ███   ███   ███    ███  ▄███▄▄▄▄██▀ ███▌   ███               ███    ███ ███▌ ███    ███ 
+ ▀███████████  ███   ███   ███ ▀███████████ ▀▀███▀▀▀▀▀   ███▌ ▀███████████      ▀███████████ ███▌ ███    ███ 
+   ███    ███  ███   ███   ███   ███    ███ ▀███████████ ███           ███        ███    ███ ███  ███    ███ 
+   ███    ███  ███   ███   ███   ███    ███   ███    ███ ███     ▄█    ███        ███    ███ ███  ███    ███ 
+   ███    █▀    ▀█   ███   █▀    ███    █▀    ███    ███ █▀    ▄████████▀         ███    █▀  █▀    ▀██████▀  
+                                              ███    ███                                                     
+                                  
+            `));
+
+            console.log(`Welcome ${auth.discord.username}`)
+            console.log(` `)
+            startMenu();
         })
     }
 }
@@ -319,22 +296,53 @@ const startMenu = () => {
                             inquirer.prompt([
                                 {
                                     type:"input",
-                                    choices:
-                                    [
-                                        {
-                                            name: "Secret key:",
-                                            value: "secKey"
-                                        },
-                                        {
-                                            name: "Public address you want to send to:",
-                                            value: "pubKeyTransfer"
-                                        }
-                                    ]
+                                    name: "secKey",
+                                    message: "Please input your wallets private key:",
+                                },
+                                {
+                                    type:"input",
+                                    name: "pubKeyTransfer",
+                                    message: "Please input the wallets public address you want to send to:",
+                                },
+                                {
+                                    type:"input",
+                                    name: "amount",
+                                    message: "Please input the amount wanted to send to the recipient:",
                                 }
                             ]).then((answers) => {
+                                console.log(chalk.yellow("Sending the SOL over now. Please stay patient, it will automatically tell you when the SOL is sent."));
+                                const transfer_request = new theblockchainapi.TransferRequest(); 
+
+                                transfer_request.recipient_address = answers.pubKeyTransfer;
+                                transfer_request.wallet = {
+                                    b58_private_key: answers.secKey
+                                };
+
+                                transfer_request.network = 'mainnet-beta';
+                                transfer_request.amount = answers.amount;
                                 
+                                async function tx_sig () { 
+                                    await apiInstance.solanaTransfer({
+                                        'transferRequest': transfer_request
+
+                                    }).then((data) => {
+                                        console.log(chalk.green(`Successfully sent ${answers.amount} SOL to ${answers.pubKeyTransfer}.`));
+
+                                        return data['transaction_signature'];
+                                    }, (error) => {
+                                        console.error(error);
+                                        return null;
+                                    }).then(() => {
+                                        setTimeout(() => {
+                                            console.clear();
+                                            init();
+                                        }, 3000); 
+                                    })
+                                }; 
+                                tx_sig();
                             })
                         }
+
                         if(answers.settings == "solbalance"){
                             inquirer.prompt([
                                 {
@@ -344,7 +352,7 @@ const startMenu = () => {
                                     choices:
                                     [
                                         {
-                                            name: "Public address:",
+                                            name: "pubkeyInput",
                                             value: "pubkeyInput"
                                         }
                                     ]
@@ -353,11 +361,10 @@ const startMenu = () => {
                                 let check = false;
 
                                 async function balanceCheck(){
-                                    let check;
                                     check = true;
                                 
-                                    const balance_request = new theblockchainapi.BalanceRequest(); // BalanceRequest | 
-                                    balance_request.public_key = answers.pubkeyInput;
+                                    const balance_request = new theblockchainapi.BalanceRequest();
+                                    balance_request.public_key = answers.solBalance;
                                     balance_request.network = 'mainnet-beta';
                                     balance_request.unit = 'sol';
                                     
@@ -368,26 +375,22 @@ const startMenu = () => {
                                     let balance_result = 
                                        await apiInstance.solanaGetBalance(opts)
                                         .then((data) => {
-                                          chalk.yellow(console.log('Finding the balance...'));
+                                          console.log(chalk.yellow('Finding the balance...'));
                                           return data;
                                         }, 
                                         (error) => {
                                           console.error(error);
                                           return error;
-                                        });
-                                    
-                                      
-                                    chalk.green(console.log("SOL Balance: ", balance_result.balance));
-                                }
+                                        }).then(() => {
+                                            console.log(chalk.green("SOL Balance: ", balance_result.balance));
 
+                                            setTimeout(() => {
+                                                console.clear();
+                                                init();
+                                            }, 3000);
+                                        })
+                                }
                                 balanceCheck();
-
-                                if(check = true){
-                                    setTimeout(() => {
-                                        console.clear();
-                                        init();
-                                    }, 2000);
-                                }
                             })
                         }
                     })
