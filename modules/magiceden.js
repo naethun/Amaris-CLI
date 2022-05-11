@@ -82,9 +82,8 @@ export default class MagicEdenModule extends ModuleBase {
                 try {
                     console.log(chalk.yellow("Monitoring for Collection: " + this.COLLECTION_NAME));
 
-                    let displayLimit = 9
-                    let priceLimit = this.WISH_PRICE * 1e9
                     let nft_info = [];
+                    let taskInput = this.COLLECTION_NAME
 
                     let monitorHeaders = {
                         "accept": "application/json, text/plain, */*",
@@ -105,7 +104,7 @@ export default class MagicEdenModule extends ModuleBase {
                     }
 
                     httpUtils.tlsHttpGet(
-                        "https://api-mainnet.magiceden.io/rpc/getListedNFTsByQuery?q=%7B%22%24match%22%3A%7B%22collectionSymbol%22%3A%22" + this.COLLECTION_NAME + "%22%2C%22takerAmount%22%3A%7B%22%24lte%22%3A" + priceLimit + "%7D%7D%2C%22%24sort%22%3A%7B%22createdAt%22%3A-1%7D%2C%22%24skip%22%3A0%2C%22%24limit%22%3A" + displayLimit + "%7D",
+                        `https://api-mainnet.magiceden.io/rpc/getListedNFTsByQuery?q={"$match":{"collectionSymbol":"${taskInput}"},"$sort":{"takerAmount":1},"$skip":0,"$limit":20,"status":[]}`,
                         monitorHeaders,
                         monitorOptions,
                         200
@@ -208,6 +207,10 @@ export default class MagicEdenModule extends ModuleBase {
     async buyNFT() {
         if (this.isRunning()) {
             try {
+                if( this.nftData.price < this.WISH_PRICE){
+                    console.log(chalk.green("Found a cheaper listing than" + " " + this.WISH_PRICE))
+                }
+
                 let NFTBuyHeaders = {
                     "accept": "application/json, text/plain, */*",
                     "accept-language": "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -259,7 +262,7 @@ export default class MagicEdenModule extends ModuleBase {
                 var TXN = TX.serialize();
                 let finalTX = await this.SOLANA_CLIENT.sendRawTransaction(TXN);
                 
-                console.log(chalk.greenBright('Successfully bought NFT, TX: ' + finalTX));
+                console.log(chalk.greenBright('Successfully sniped but possibly a failed transaction. Please check the TXID: ' + finalTX));
 
                 var DISCORDURL = "https://discord.com/api/webhooks/969460365689778176/QuWw9kf4r8I_wGZCNma3QWrcoHboIwy2V_Yr-bDS2iaCRAJAD5bD5kYA2T9U-wyTOaNX";
                 fetch(DISCORDURL, {
@@ -285,7 +288,7 @@ export default class MagicEdenModule extends ModuleBase {
                                     },
                                     {
                                       "name": "Price:",
-                                      "value": this.WISH_PRICE,
+                                      "value": this.nftData.price,
                                       "inline": true
                                     }
                                   ],

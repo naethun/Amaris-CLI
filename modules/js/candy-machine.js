@@ -34,9 +34,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import anchor from '@project-serum/anchor';
-import { MintLayout, TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { Token } from '@solana/spl-token';
+import * as anchor from '@project-serum/anchor';
+import { MintLayout, TOKEN_PROGRAM_ID, Token } from '@solana/spl-token';
 import { SystemProgram } from '@solana/web3.js';
 import { sendTransactions } from './connection.js';
 import { CIVIC, getAtaForMint, getNetworkExpire, getNetworkToken, SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID, } from './utils.js';
@@ -88,7 +87,7 @@ export var awaitTransactionSignatureConfirmation = function (txid, timeout, conn
                                                             status = signatureStatuses && signatureStatuses.value[0];
                                                             if (!done) {
                                                                 if (!status) {
-                                                                    //console.log('REST null result for', txid, status);
+                                                                    console.log('REST null result for', txid, status);
                                                                 }
                                                                 else if (status.err) {
                                                                     console.log('REST error for', txid, status);
@@ -96,10 +95,10 @@ export var awaitTransactionSignatureConfirmation = function (txid, timeout, conn
                                                                     reject(status.err);
                                                                 }
                                                                 else if (!status.confirmations) {
-                                                                    //console.log('REST no confirmations for', txid, status);
+                                                                    console.log('REST no confirmations for', txid, status);
                                                                 }
                                                                 else {
-                                                                    //console.log('REST confirmation for', txid, status);
+                                                                    console.log('REST confirmation for', txid, status);
                                                                     done = true;
                                                                     resolve(status);
                                                                 }
@@ -108,7 +107,7 @@ export var awaitTransactionSignatureConfirmation = function (txid, timeout, conn
                                                         case 2:
                                                             e_1 = _a.sent();
                                                             if (!done) {
-                                                                //console.log('REST connection error: txid', txid, e_1);
+                                                                console.log('REST connection error: txid', txid, e_1);
                                                             }
                                                             return [3 /*break*/, 3];
                                                         case 3: return [2 /*return*/];
@@ -374,7 +373,7 @@ export var mintOneToken = function (candyMachine, payer) {
                     return [4 /*yield*/, getMasterEdition(mint.publicKey)];
                 case 13:
                     masterEdition = _p.sent();
-                    //console.log(masterEdition);
+                    console.log(masterEdition);
                     return [4 /*yield*/, getCandyMachineCreator(candyMachineAddress)];
                 case 14:
                     _h = _p.sent(), candyMachineCreator = _h[0], creatorBump = _h[1];

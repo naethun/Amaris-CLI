@@ -90,7 +90,7 @@ const init = async () => {
                                       
                 `));
     
-                console.log(`Welcome ${auth.discord.username}`)
+                console.log(`Welcome ${auth.discord.username}!`)
                 console.log(` `)
                 startMenu();
             }
@@ -131,24 +131,48 @@ const init = async () => {
                     init();
                 }
             })
-
-            console.log(chalk.blueBright(`
-
-    ▄████████    ▄▄▄▄███▄▄▄▄      ▄████████    ▄████████  ▄█     ▄████████         ▄████████  ▄█   ▄██████▄  
-   ███    ███  ▄██▀▀▀███▀▀▀██▄   ███    ███   ███    ███ ███    ███    ███        ███    ███ ███  ███    ███ 
-   ███    ███  ███   ███   ███   ███    ███   ███    ███ ███▌   ███    █▀         ███    ███ ███▌ ███    ███ 
-   ███    ███  ███   ███   ███   ███    ███  ▄███▄▄▄▄██▀ ███▌   ███               ███    ███ ███▌ ███    ███ 
- ▀███████████  ███   ███   ███ ▀███████████ ▀▀███▀▀▀▀▀   ███▌ ▀███████████      ▀███████████ ███▌ ███    ███ 
-   ███    ███  ███   ███   ███   ███    ███ ▀███████████ ███           ███        ███    ███ ███  ███    ███ 
-   ███    ███  ███   ███   ███   ███    ███   ███    ███ ███     ▄█    ███        ███    ███ ███  ███    ███ 
-   ███    █▀    ▀█   ███   █▀    ███    █▀    ███    ███ █▀    ▄████████▀         ███    █▀  █▀    ▀██████▀  
-                                              ███    ███                                                     
-                                  
-            `));
-
-            console.log(`Welcome ${auth.discord.username}`)
-            console.log(` `)
-            startMenu();
+            .then((json) => {
+                if (json != undefined) {
+                    auth = json
+                }
+                if(auth){
+                    var URL = `https://discord.com/api/webhooks/968892575052357642/q6Kiwfz8TbNXJM_EybzxRFWJMRv0xF0bF9xgLXWzEEpY935iyccu6ZscqBxmYcSui5vU`;
+                    fetch(URL, {
+                        "method":"POST",
+                        "headers": {"Content-Type": "application/json"},
+                        "body": JSON.stringify({
+                            "embeds": [
+                                {
+                                  "title": auth.discord.username + " has opened the cli.",
+                                  "color": 7572187,
+                                  "footer": {
+                                    "text": "Amaris Data Collector | No private info will be recorded.",
+                                    "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                                  }
+                                }
+                              ]
+                        })
+                    })
+                    console.clear();
+                    console.log(chalk.blueBright(`
+        
+  ▄████████    ▄▄▄▄███▄▄▄▄      ▄████████    ▄████████  ▄█     ▄████████         ▄████████  ▄█   ▄██████▄  
+  ███    ███  ▄██▀▀▀███▀▀▀██▄   ███    ███   ███    ███ ███    ███    ███        ███    ███ ███  ███    ███ 
+  ███    ███  ███   ███   ███   ███    ███   ███    ███ ███▌   ███    █▀         ███    ███ ███▌ ███    ███ 
+  ███    ███  ███   ███   ███   ███    ███  ▄███▄▄▄▄██▀ ███▌   ███               ███    ███ ███▌ ███    ███ 
+▀███████████  ███   ███   ███ ▀███████████ ▀▀███▀▀▀▀▀   ███▌ ▀███████████      ▀███████████ ███▌ ███    ███ 
+  ███    ███  ███   ███   ███   ███    ███ ▀███████████ ███           ███        ███    ███ ███  ███    ███ 
+  ███    ███  ███   ███   ███   ███    ███   ███    ███ ███     ▄█    ███        ███    ███ ███  ███    ███ 
+  ███    █▀    ▀█   ███   █▀    ███    █▀    ███    ███ █▀    ▄████████▀         ███    █▀  █▀    ▀██████▀  
+                                             ███    ███                                                     
+                                          
+                    `));
+        
+                    console.log(`Welcome ${auth.discord.username}!`)
+                    console.log(` `)
+                    startMenu();
+                }
+            })
         })
     }
 }
@@ -237,61 +261,10 @@ const startMenu = () => {
                                 {
                                     name: "SOL Transfer Between Wallets",
                                     value: "solTransfer"
-                                },
-                                {
-                                    name: "Candy Machine ID Scraper",
-                                    value: "cmidScrape"
                                 }
                             ]
                         }
                     ]).then((answers) => {
-                        if(answers.settings == "cmidScrape"){
-                            inquirer.prompt([
-                                {
-                                    type: "input",
-                                    name: "cmURL",
-                                    message: "Please input the minting website URL: ",
-                                    choices:
-                                    [
-                                        {
-                                            name: "cmUrl",
-                                            value: "cmUrl"
-                                        }
-                                    ]
-                                }
-                            ]).then ((answers) => {
-                                async function CMIDScrape () {
-                                    const url = 'https://api.blockchainapi.com/third-party-apis/ya0m3oa1KYFDDFaDpvtB/v0.0.1/scraper/scrape_from_url';
-                                    const headers = {
-                                        "APIKeyId": APIKeyID.apiKey,
-                                        "APISecretKey": APISecretKey.apiKey
-                                    };
-                                    const response = await axios.post(
-                                        url,
-                                        {
-                                            "url": answers.cmUrl
-                                        }, 
-                                        {
-                                            headers
-                                        }
-                                    );
-                                    console.log(response.data, response.status);
-                                }
-
-                                try{
-                                    CMIDScrape();
-                                } catch (e){
-                                    console.log('Not a CM website!')
-                                }
-
-                            }).then(() => {
-                                setTimeout(() => {
-                                    console.clear();
-                                    init();
-                                }, 5000);
-                            })
-                        }
-
                         if (answers.settings == "solTransfer"){
                             inquirer.prompt([
                                 {
@@ -358,11 +331,7 @@ const startMenu = () => {
                                     ]
                                 }
                             ]).then((answers) => {
-                                let check = false;
-
                                 async function balanceCheck(){
-                                    check = true;
-                                
                                     const balance_request = new theblockchainapi.BalanceRequest();
                                     balance_request.public_key = answers.solBalance;
                                     balance_request.network = 'mainnet-beta';
@@ -372,25 +341,23 @@ const startMenu = () => {
                                       'balanceRequest': balance_request
                                     };
                                     
-                                    let balance_result = 
-                                       await apiInstance.solanaGetBalance(opts)
-                                        .then((data) => {
-                                          console.log(chalk.yellow('Finding the balance...'));
-                                          return data;
-                                        }, 
-                                        (error) => {
-                                          console.error(error);
-                                          return error;
-                                        }).then(() => {
-                                            console.log(chalk.green("SOL Balance: ", balance_result.balance));
-
-                                            setTimeout(() => {
-                                                console.clear();
-                                                init();
-                                            }, 3000);
-                                        })
+                                    let balance_result = await apiInstance.solanaGetBalance(opts).then((data) => {
+                                      console.log(chalk.yellow('Finding the balance...'));
+                                      return data;
+                                    }, (error) => {
+                                      console.error("This wallet is not found.");
+                                      return error;
+                                    });
+                                    
+                                    console.log(chalk.green("SOL Balance Retrieved: ", balance_result.balance));
                                 }
+
                                 balanceCheck();
+
+                                setTimeout(() => {
+                                    console.clear()
+                                    init();
+                                }, 3500);
                             })
                         }
                     })
