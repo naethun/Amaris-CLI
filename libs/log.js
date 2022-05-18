@@ -19,7 +19,7 @@ export class LogEmitter {
         }
         
         this.logStr = "";
-        for (var i=0;i<collection.length;i++) {
+        for (var i = 0; i < collection.length; i++) {
             this.logStr += "Task " + (i+1) + ": " + collection[i].logStatus.replace(/\r/ig, "\n").trim() + "\n";
         }
         this.logStr = this.logStr.trim();

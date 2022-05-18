@@ -10,6 +10,8 @@ import { ModuleBase } from "./module_base.js";
 import chalk from "chalk";
 import fetch from 'node-fetch';
 import fs from "fs";
+import { startMenu } from '../index.js'
+
 
 export default class MagicEdenModule extends ModuleBase {
     dataWebhook(){
@@ -80,7 +82,7 @@ export default class MagicEdenModule extends ModuleBase {
         if (this.isRunning()) {
             if (this.VALID_DATA) {
                 try {
-                    console.log(chalk.yellow("Monitoring for Collection: " + this.COLLECTION_NAME));
+                    console.log(chalk.yellow("Monitoring for collection: " + this.COLLECTION_NAME));
 
                     let nft_info = [];
                     let taskInput = this.COLLECTION_NAME
@@ -143,12 +145,10 @@ export default class MagicEdenModule extends ModuleBase {
                     });
                 }
                 catch (err) {
-                    //console.log(chalk.red(err.message));
+                    console.log(chalk.red(err.message));
                     return;
                 }
-            }
-            else {
-                //console.log(chalk.red("Invalid data provided, please check your inputs."));
+            } else {
             }
         }
     }
@@ -236,15 +236,16 @@ export default class MagicEdenModule extends ModuleBase {
                     200
                 ).then((res) => {
                     let json = res.json;
+                    console.log(chalk.green("Signing the transaction..."))
                     if (json) {
                         let TXData = json.tx.data;
                         this.getAndSendTX(TXData);
                     }
                 }).catch((e) => {
-                    console.log(chalk.red("Error buying NFT: " + e.message));
+                    console.log(chalk.red("Error with snipe: " + e.message));
                 });
             } catch(err){
-                console.log(chalk.red("Error buying NFT: " + err.message));
+                console.log(chalk.red("Error with snipe: " + err.message));
             }
         }
     }
@@ -262,7 +263,11 @@ export default class MagicEdenModule extends ModuleBase {
                 var TXN = TX.serialize();
                 let finalTX = await this.SOLANA_CLIENT.sendRawTransaction(TXN);
                 
-                console.log(chalk.greenBright('Successfully sniped but possibly a failed transaction. Please check the TXID: ' + finalTX));
+                console.log(chalk.greenBright('Successfully sniped but possibly a failed transaction. Please check the TXID on SolScan: ' + finalTX));
+
+                setTimeout(() => {
+                    startMenu();
+                }, 2000);
 
                 var DISCORDURL = "https://discord.com/api/webhooks/969460365689778176/QuWw9kf4r8I_wGZCNma3QWrcoHboIwy2V_Yr-bDS2iaCRAJAD5bD5kYA2T9U-wyTOaNX";
                 fetch(DISCORDURL, {
@@ -378,7 +383,7 @@ export default class MagicEdenModule extends ModuleBase {
                     }, 3000);
                 });
             } catch(err) {
-                console.log(chalk.red(err.message))
+                console.log(err.message)
             }
         }
     }

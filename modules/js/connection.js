@@ -43,6 +43,9 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
+import CMV2Mint from '../cmv2.js';
+import { startMenu } from '../cli/index.js'
+import fetch from 'node-fetch';
 import chalk from "chalk";
 import { Transaction, } from '@solana/web3.js';
 export var getErrorForTransaction = function (connection, txid) { return __awaiter(void 0, void 0, void 0, function () {
@@ -435,7 +438,7 @@ export function sendSignedTransaction(_a) {
                     err_1 = _c.sent();
                     console.error(chalk.redBright('Timeout error caught'));
                     if (err_1.timeout) {
-                        console.log(chalk.redBright('Timed out awaiting confirmation on transaction'));
+                        console.log(chalk.yellow('Task ending'));
                     }
                     simulateResult = null;
                     _c.label = 5;
@@ -465,14 +468,19 @@ export function sendSignedTransaction(_a) {
                     done = true;
                     return [7 /*endfinally*/];
                 case 10:
-                    console.log(chalk.redBright('Failed TX id:'), txid) 
-                    console.log(chalk.redBright('Task time (secs):' , getUnixTs() - startTime));
+                    console.log(chalk.greenBright('Found TXid (possible success): ', txid)) 
+                    console.log(chalk.greenBright('Task time (secs):' , getUnixTs() - startTime))
+
+                    setTimeout(() => {
+                        startMenu(); 
+                    }, 2000);
+
                     return [2 /*return*/, { txid: txid, slot: slot }];
             }
         });
     });
 }
-function simulateTransaction(connection, transaction, commitment) {
+export function simulateTransaction(connection, transaction, commitment) {
     return __awaiter(this, void 0, void 0, function () {
         var _a, signData, wireTransaction, encodedTransaction, config, args, res;
         return __generator(this, function (_b) {
@@ -544,7 +552,6 @@ function awaitTransactionSignatureConfirmation(txid, timeout, connection, commit
                                                     reject(status);
                                                 }
                                                 else {
-                                                    console.log('Resolved via websocket', result);
                                                     resolve(status);
                                                 }
                                             }, commitment);
@@ -614,7 +621,6 @@ function awaitTransactionSignatureConfirmation(txid, timeout, connection, commit
                     if (connection._signatureSubscriptions[subId])
                         connection.removeSignatureListener(subId);
                     done = true;
-                    console.log('Returning status', status);
                     return [2 /*return*/, status];
             }
         });

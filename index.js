@@ -30,55 +30,51 @@ let apiInstance = new theblockchainapi.SolanaWalletApi();
 
 let modules;
 
-const init = async () => {
-    try{
-        var auth = null;
-        modules = JSON.parse(fs.readFileSync("./modules.json"));
-        var raw = fs.readFileSync("./auth.json")
-        var key = JSON.parse(raw)
+function login (key) {
+    var auth = null;
 
-        const options = {
-            method: "GET",
-            headers: {
-                "Authorization": "Bearer NmNiNjJjMjlmODNmNzc3N2IwZWNjZjg0MTBkMGYxZTg1OWFlYmEwMDAwOmE1OTMwMDNhZjQyZjZlZGIyZTE5NGIwNmE3MTE1N2QyMTY4MTIxMjI5OQ=="
-            }
-        };
-        fetch(`https://api.whop.io/api/v1/licenses/${key.key}`, options)
-        .then((response) => {
-            if (response.status === 200) {
-                return response.json();
-            }
-            else{
-                console.log("Key is not detected in our database. Please retry.")
-                init();
-            }
-        })
-        .then((json) => {
-            if (json != undefined) {
-                auth = json
-            }
-            if(auth){
-                var URL = `https://discord.com/api/webhooks/968892575052357642/q6Kiwfz8TbNXJM_EybzxRFWJMRv0xF0bF9xgLXWzEEpY935iyccu6ZscqBxmYcSui5vU`;
-                fetch(URL, {
-                    "method":"POST",
-                    "headers": {"Content-Type": "application/json"},
-                    "body": JSON.stringify({
-                        "embeds": [
-                            {
-                              "title": auth.discord.username + " has opened the cli.",
-                              "color": 7572187,
-                              "footer": {
-                                "text": "Amaris Data Collector | No private info will be recorded.",
-                                "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
-                              }
-                            }
-                          ]
-                    })
+    const options = {
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer NmNiNjJjMjlmODNmNzc3N2IwZWNjZjg0MTBkMGYxZTg1OWFlYmEwMDAwOmE1OTMwMDNhZjQyZjZlZGIyZTE5NGIwNmE3MTE1N2QyMTY4MTIxMjI5OQ=="
+        }
+    };
+    fetch(`https://api.whop.io/api/v1/licenses/${key}`, options)
+    .then((response) => {
+        if (response.status === 200) {
+            return response.json();
+        }
+        else{
+            console.log("Key is not detected in our database. Please retry.")
+            init();
+        }
+    })
+    .then((json) => {
+        if (json != undefined) {
+            auth = json
+        }
+        if(auth){
+            var URL = `https://discord.com/api/webhooks/968892575052357642/q6Kiwfz8TbNXJM_EybzxRFWJMRv0xF0bF9xgLXWzEEpY935iyccu6ZscqBxmYcSui5vU`;
+            fetch(URL, {
+                "method":"POST",
+                "headers": {"Content-Type": "application/json"},
+                "body": JSON.stringify({
+                    "embeds": [
+                        {
+                          "title": auth.discord.username + " has opened the cli.",
+                          "color": 7572187,
+                          "footer": {
+                            "text": "Amaris Data Collector | No private info will be recorded.",
+                            "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                          }
+                        }
+                      ]
                 })
-    
-                console.log(chalk.blueBright(`
-    
-  ▄████████    ▄▄▄▄███▄▄▄▄      ▄████████    ▄████████  ▄█     ▄████████         ▄████████  ▄█   ▄██████▄  
+            })
+
+            console.log(chalk.blueBright(`
+
+   ▄████████    ▄▄▄▄███▄▄▄▄      ▄████████    ▄████████  ▄█     ▄████████         ▄████████  ▄█   ▄██████▄  
   ███    ███  ▄██▀▀▀███▀▀▀██▄   ███    ███   ███    ███ ███    ███    ███        ███    ███ ███  ███    ███ 
   ███    ███  ███   ███   ███   ███    ███   ███    ███ ███▌   ███    █▀         ███    ███ ███▌ ███    ███ 
   ███    ███  ███   ███   ███   ███    ███  ▄███▄▄▄▄██▀ ███▌   ███               ███    ███ ███▌ ███    ███ 
@@ -87,14 +83,23 @@ const init = async () => {
   ███    ███  ███   ███   ███   ███    ███   ███    ███ ███     ▄█    ███        ███    ███ ███  ███    ███ 
   ███    █▀    ▀█   ███   █▀    ███    █▀    ███    ███ █▀    ▄████████▀         ███    █▀  █▀    ▀██████▀  
                                              ███    ███                                                     
-                                      
-                `));
-    
-                console.log(`Welcome ${auth.discord.username}!`)
-                console.log(` `)
-                startMenu();
-            }
-        })
+                                  
+            `));
+
+            console.log("Welcome " + chalk.blue(auth.discord.username) + "!")
+            console.log(` `)
+            startMenu();
+        }
+    })
+}
+
+export const init = async () => {
+    try{
+        modules = JSON.parse(fs.readFileSync("./modules.json"));
+        var raw = fs.readFileSync("./auth.json")
+        var key = JSON.parse(raw)
+
+        login(key.key);
     } catch {
         inquirer.prompt ([
             {
@@ -111,68 +116,10 @@ const init = async () => {
             }
         ]).then(async (answers) => {
             modules = JSON.parse(fs.readFileSync("./modules.json"));
-            var auth = null;
             var key = answers.auth
-        
-            const options = {
-                method: "GET",
-                headers: {
-                    "Authorization": "Bearer NmNiNjJjMjlmODNmNzc3N2IwZWNjZjg0MTBkMGYxZTg1OWFlYmEwMDAwOmE1OTMwMDNhZjQyZjZlZGIyZTE5NGIwNmE3MTE1N2QyMTY4MTIxMjI5OQ=="
-                }
-            };
-            fetch(`https://api.whop.io/api/v1/licenses/${key}`, options)
-            .then((response) => {
-                if (response.status === 200) {
-                    fs.writeFileSync('auth.json', `{ "key": ${JSON.stringify(key)} }`);
-                    return response.json();
-                }
-                else{
-                    console.log("Key is not detected in our database. Please retry.")
-                    init();
-                }
-            })
-            .then((json) => {
-                if (json != undefined) {
-                    auth = json
-                }
-                if(auth){
-                    var URL = `https://discord.com/api/webhooks/968892575052357642/q6Kiwfz8TbNXJM_EybzxRFWJMRv0xF0bF9xgLXWzEEpY935iyccu6ZscqBxmYcSui5vU`;
-                    fetch(URL, {
-                        "method":"POST",
-                        "headers": {"Content-Type": "application/json"},
-                        "body": JSON.stringify({
-                            "embeds": [
-                                {
-                                  "title": auth.discord.username + " has opened the cli.",
-                                  "color": 7572187,
-                                  "footer": {
-                                    "text": "Amaris Data Collector | No private info will be recorded.",
-                                    "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
-                                  }
-                                }
-                              ]
-                        })
-                    })
-                    console.clear();
-                    console.log(chalk.blueBright(`
-        
-  ▄████████    ▄▄▄▄███▄▄▄▄      ▄████████    ▄████████  ▄█     ▄████████         ▄████████  ▄█   ▄██████▄  
-  ███    ███  ▄██▀▀▀███▀▀▀██▄   ███    ███   ███    ███ ███    ███    ███        ███    ███ ███  ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███   ███    ███ ███▌   ███    █▀         ███    ███ ███▌ ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███  ▄███▄▄▄▄██▀ ███▌   ███               ███    ███ ███▌ ███    ███ 
-▀███████████  ███   ███   ███ ▀███████████ ▀▀███▀▀▀▀▀   ███▌ ▀███████████      ▀███████████ ███▌ ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███ ▀███████████ ███           ███        ███    ███ ███  ███    ███ 
-  ███    ███  ███   ███   ███   ███    ███   ███    ███ ███     ▄█    ███        ███    ███ ███  ███    ███ 
-  ███    █▀    ▀█   ███   █▀    ███    █▀    ███    ███ █▀    ▄████████▀         ███    █▀  █▀    ▀██████▀  
-                                             ███    ███                                                     
-                                          
-                    `));
-        
-                    console.log(`Welcome ${auth.discord.username}!`)
-                    console.log(` `)
-                    startMenu();
-                }
-            })
+            fs.writeFileSync('auth.json', `{ "key": ${JSON.stringify(key)} }`);
+
+            login(key);
         })
     }
 }
@@ -193,7 +140,7 @@ client.login({ clientId : '958506386562621450' }).catch(console.error);
     });
 
 
-const startMenu = () => {
+export const startMenu = () => {
     global.prompt = inquirer.prompt([
         {
             type:"list",
@@ -261,6 +208,14 @@ const startMenu = () => {
                                 {
                                     name: "SOL Transfer Between Wallets",
                                     value: "solTransfer"
+                                },
+                                {
+                                    name: "Magic Eden List",
+                                    value: "melist"
+                                },
+                                {
+                                    name:"Magic Eden Delist",
+                                    value: "medelist"
                                 }
                             ]
                         }

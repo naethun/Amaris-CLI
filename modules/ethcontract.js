@@ -8,6 +8,7 @@ import { LogEmitter } from "../libs/log.js";
 import { ModuleBase } from "./module_base.js";
 import chalk from "chalk";
 import fetch from 'node-fetch';
+import { startMenu } from '../index.js'
 
 
 
@@ -132,6 +133,10 @@ export default class EthContract extends ModuleBase {
                 })
             } catch {
                 console.log(chalk.red("Error with mint! Please check your inputs." ));
+                
+                setTimeout(() => {
+                  startMenu(); 
+                }, 2000);
             }
         }
       }

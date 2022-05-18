@@ -34,8 +34,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-import * as anchor from '@project-serum/anchor';
-import { MintLayout, TOKEN_PROGRAM_ID, Token } from '@solana/spl-token';
+import anchor from '@project-serum/anchor';
+import { MintLayout, TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { Token } from '@solana/spl-token';
 import { SystemProgram } from '@solana/web3.js';
 import { sendTransactions } from './connection.js';
 import { CIVIC, getAtaForMint, getNetworkExpire, getNetworkToken, SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID, } from './utils.js';
@@ -253,6 +254,7 @@ export var getCandyMachineCreator = function (candyMachine) {
         });
     });
 };
+
 export var mintOneToken = function (candyMachine, payer) {
     return __awaiter(void 0, void 0, void 0, function () {
         var mint, userTokenAccountAddress, userPayingAccountAddress, _a, candyMachineAddress, remainingAccounts, signers, cleanupInstructions, instructions, _b, _c, _d, _e, _f, _g, mint_1, whitelistToken, whitelistBurnAuthority, exists, transferAuthority, metadataAddress, masterEdition, _h, candyMachineCreator, creatorBump, _j, _k, e_2;

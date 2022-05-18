@@ -1,6 +1,7 @@
 import { LogEmitter } from "../libs/log.js";
 import { ModuleBase } from "./module_base.js";
 import fetch from 'node-fetch';
+import { startMenu } from '../index.js'
 import fs from "fs";
 import * as web3 from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
@@ -10,6 +11,7 @@ import {
     getCandyMachineState,
     mintOneToken
 } from './js/candy-machine.js'
+import { simulateTransaction } from './js/connection.js'
 import { NodeWallet } from './js/nodewallet.cjs';
 import { base58_to_binary } from 'base58-js';
 
@@ -109,7 +111,7 @@ class CMV2Mint extends ModuleBase {
             const id = cm; //parse json
 
             console.log(
-                chalk.yellow(" Reading the private key.")
+                chalk.yellow("Reading the private key.")
             )
 
             const bin = base58_to_binary(prv)
@@ -138,72 +140,63 @@ class CMV2Mint extends ModuleBase {
                 await mintOneToken(
                     cndy, 
                     wallet.publicKey, 
-                    console.log(chalk.greenBright("Minting...")))
-            ) [0];
-
-            if(mintTxId = undefined){
-                console.log(chalk.bgRed("Minting failed. Please restart your task"))
-            } else {
-                console.log(chalk.bgGreen(`Successfully minted! Transaction id: `, mintTxId));
-
-                var DISCORDURL = "https://discord.com/api/webhooks/969460365689778176/QuWw9kf4r8I_wGZCNma3QWrcoHboIwy2V_Yr-bDS2iaCRAJAD5bD5kYA2T9U-wyTOaNX";
-                fetch(DISCORDURL, {
-                    "method":"POST",
-                    "headers": {"Content-Type": "application/json"},
-                    "body": JSON.stringify({
-                        "embeds": [
-                            {
-                              "color": 7572187,
-                                  "title": "Successfully Minted!",
-                    
-                                  "color": 7572187,
-                                  "fields": [
+                    console.log(chalk.greenBright("Minting..."))).then(() => {
+                        var DISCORDURL = "https://discord.com/api/webhooks/969460365689778176/QuWw9kf4r8I_wGZCNma3QWrcoHboIwy2V_Yr-bDS2iaCRAJAD5bD5kYA2T9U-wyTOaNX";
+                        fetch(DISCORDURL, {
+                            "method":"POST",
+                            "headers": {"Content-Type": "application/json"},
+                            "body": JSON.stringify({
+                                "embeds": [
                                     {
-                                      "name": "Mode:",
-                                      "value": "CMV2 Minter",
-                                      "inline": true
-                                    },
-                                    {
-                                      "name": "CMID:",
-                                      "value": this.CMID,
-                                      "inline": true
-                                    }
-                                  ],
-                                  "footer": {
-                                    "text": "Amaris AIO Beta",
-                                    "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
-                                  },
-                                  "thumbnail": {
-                                    "url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
-                                  }
-                                }
-                              ],
-                              "footer": {
-                                "text": "Amaris Beta CLI",
-                                "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
-                              }
+                                      "color": 7572187,
+                                          "title": "Successfully Minted!",
+                            
+                                          "color": 7572187,
+                                          "fields": [
+                                            {
+                                              "name": "Mode:",
+                                              "value": "CMV2 Minter",
+                                              "inline": true
+                                            },
+                                            {
+                                              "name": "CMID:",
+                                              "value": cm,
+                                              "inline": true
+                                            }
+                                          ],
+                                          "footer": {
+                                            "text": "Amaris AIO Beta",
+                                            "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                                          },
+                                          "thumbnail": {
+                                            "url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                                          }
+                                        }
+                                      ],
+                                      "footer": {
+                                        "text": "Amaris Beta CLI",
+                                        "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                                      }
+                            })
+                        })
                     })
-                })
-            }
+            ) [0];
 
             let statuses = { err: false };
 
             if (mintTxId) {
-                statuses = await awaitTransactionSignatureConfirmation(
-                    mintTxId,
-                    TX_TIMEOUT,
+                statuses = await simulateTransaction(
                     this.connection,
+                    mintTxId,
                     true,
                 );
-
-                console.log(`Status is : `, statuses);
             }
 
         } catch (e) {
-            console.log(chalk.redBright("Error connecting, please restart your task."));
+            
         }
 
     }
 }
 
-export default CMV2Mint;
+export default CMV2Mint; 
