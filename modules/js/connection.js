@@ -44,7 +44,6 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 import CMV2Mint from '../cmv2.js';
-import { startMenu } from '../cli/index.js'
 import fetch from 'node-fetch';
 import chalk from "chalk";
 import { Transaction, } from '@solana/web3.js';
@@ -470,10 +469,6 @@ export function sendSignedTransaction(_a) {
                 case 10:
                     console.log(chalk.greenBright('Found TXid (possible success): ', txid)) 
                     console.log(chalk.greenBright('Task time (secs):' , getUnixTs() - startTime))
-
-                    setTimeout(() => {
-                        startMenu(); 
-                    }, 2000);
 
                     return [2 /*return*/, { txid: txid, slot: slot }];
             }

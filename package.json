@@ -19,7 +19,6 @@
     "axios": "^0.26.1",
     "base58-js": "^1.0.0",
     "bs58": "^5.0.0",
-    "candymachinescraper": "^1.1.12",
     "chalk": "^5.0.1",
     "csv-parser": "^3.0.0",
     "discord-rpc": "^4.0.1",

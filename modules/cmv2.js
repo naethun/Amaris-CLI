@@ -1,7 +1,7 @@
 import { LogEmitter } from "../libs/log.js";
 import { ModuleBase } from "./module_base.js";
 import fetch from 'node-fetch';
-import { startMenu } from '../index.js'
+import { startMenu, init } from '../index.js'
 import fs from "fs";
 import * as web3 from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
@@ -84,6 +84,10 @@ class CMV2Mint extends ModuleBase {
                     this.cop(this.PRIVATE_KEY, this.CMID, this.RPC);
                 } catch {
                     LogEmitter.log(this, "Error, couldnt load task.")
+
+                    setTimeout(() => {
+                        init();
+                      }, 2500);
                 }
             }
         }
@@ -136,51 +140,64 @@ class CMV2Mint extends ModuleBase {
                 console.log(chalk.greenBright("Initalizing transaction for mint!"))
             );
 
+            let webhook = false;
+
             const mintTxId = (
                 await mintOneToken(
                     cndy, 
                     wallet.publicKey, 
-                    console.log(chalk.greenBright("Minting..."))).then(() => {
-                        var DISCORDURL = "https://discord.com/api/webhooks/969460365689778176/QuWw9kf4r8I_wGZCNma3QWrcoHboIwy2V_Yr-bDS2iaCRAJAD5bD5kYA2T9U-wyTOaNX";
-                        fetch(DISCORDURL, {
-                            "method":"POST",
-                            "headers": {"Content-Type": "application/json"},
-                            "body": JSON.stringify({
-                                "embeds": [
-                                    {
-                                      "color": 7572187,
-                                          "title": "Successfully Minted!",
-                            
-                                          "color": 7572187,
-                                          "fields": [
-                                            {
-                                              "name": "Mode:",
-                                              "value": "CMV2 Minter",
-                                              "inline": true
-                                            },
-                                            {
-                                              "name": "CMID:",
-                                              "value": cm,
-                                              "inline": true
-                                            }
-                                          ],
-                                          "footer": {
-                                            "text": "Amaris AIO Beta",
-                                            "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
-                                          },
-                                          "thumbnail": {
-                                            "url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
-                                          }
-                                        }
-                                      ],
-                                      "footer": {
-                                        "text": "Amaris Beta CLI",
-                                        "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
-                                      }
-                            })
-                        })
-                    })
+                    console.log(chalk.greenBright("Minting..."))
+                )
             ) [0];
+            
+            setTimeout(() => {
+                webhook = true;
+            }, 3000)
+            
+            if (webhook = true) { 
+                var DISCORDURL = "https://discord.com/api/webhooks/969460365689778176/QuWw9kf4r8I_wGZCNma3QWrcoHboIwy2V_Yr-bDS2iaCRAJAD5bD5kYA2T9U-wyTOaNX";
+                fetch(DISCORDURL, {
+                    "method":"POST",
+                    "headers": {"Content-Type": "application/json"},
+                    "body": JSON.stringify({
+                        "embeds": [
+                            {
+                              "color": 7572187,
+                                  "title": "Successfully Minted!",
+                    
+                                  "color": 7572187,
+                                  "fields": [
+                                    {
+                                      "name": "Mode:",
+                                      "value": "CMV2 Minter",
+                                      "inline": true
+                                    },
+                                    {
+                                      "name": "CMID:",
+                                      "value": this.CMID,
+                                      "inline": true
+                                    }
+                                  ],
+                                  "footer": {
+                                    "text": "Amaris AIO Beta",
+                                    "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                                  },
+                                  "thumbnail": {
+                                    "url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                                  }
+                                }
+                              ],
+                              "footer": {
+                                "text": "Amaris Beta CLI",
+                                "icon_url": "https://cdn.discordapp.com/attachments/967228705783025745/967234084403281950/Amar1.png"
+                              }
+                    })
+                })
+            }
+
+            setTimeout(() => {
+                init();
+            }, 2500);
 
             let statuses = { err: false };
 
@@ -193,7 +210,11 @@ class CMV2Mint extends ModuleBase {
             }
 
         } catch (e) {
-            
+            console.log(e)
+
+            setTimeout(() => {
+                init();
+              }, 2500);
         }
 
     }

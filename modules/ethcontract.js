@@ -8,8 +8,9 @@ import { LogEmitter } from "../libs/log.js";
 import { ModuleBase } from "./module_base.js";
 import chalk from "chalk";
 import fetch from 'node-fetch';
-import { startMenu } from '../index.js'
+import { startMenu, init } from '../index.js'
 
+let rawdata = fs.readFileSync("./presave/ethcontract.json"); // read data
 
 
 export default class EthContract extends ModuleBase {
@@ -54,25 +55,18 @@ export default class EthContract extends ModuleBase {
             })
         }
     })
-}
-      getContractAbi = ( function(contract) {
-            return new Promise(resolve => {
-                axios.get(`https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${contract}&apikey=8PYU2IVYBPRXZEYI28FPTK5CIE53K85SU6`)
-                .then((response) => {
-                  resolve(response.data.result);
-                });  
-              });
-      });
-    
+}   
 
       constructor(data) {
         super();
         try {
-            this.CONTRACT_ADDRESS = data.contract_address;
-            this.FUNCTION_NAME = data.function_name;
-            this.PRIVATE_KEY = data.private_key;
-            this.GAS_PRICE = data.gas_price;
-            this.PRICE = data.price;
+            let input = JSON.parse(rawdata);// put parsed json data into here
+
+            this.CONTRACT_ADDRESS = input.contract_address;
+            this.FUNCTION_NAME = input.function_name;
+            this.PRIVATE_KEY = input.private_key;
+            this.GAS_PRICE = input.gas_price;
+            this.PRICE = input.price;
             this.VALID_DATA = true;
             console.log(chalk.green('Pulling the data...'))
         }
@@ -86,62 +80,80 @@ export default class EthContract extends ModuleBase {
         if (this.isRunning()) {
           if (this.VALID_DATA) {
             try{
-                //let rawdata = fs.readFileSync('../config/ethcontract.json'); // read data
-                //let input = JSON.parse(rawdata);// put parsed json data into here
-                if(contract_address = null){
-                  console.log(chalk.red("Error with contract address!" ));
-                }
-                if(SmartContract = null){
-                  console.log(chalk.red("Error with Smart Contract!" ));
-                }
-
-                 await this.getContractAbi(this.CONTRACT_ADDRESS).then ( async (abi) => {
-                    let SmartContract = abi;
-                    SmartContract = JSON.parse(SmartContract)
-              
-                    const pKey = this.PRIVATE_KEY; //put user pk in jere
-              
-                    let provider = new HDWalletProvider(
-                      [pKey],
-                      'https://rinkeby.infura.io/v3/b38e1437734a404f9ff3d070d5ddad40',
-                      0
-                    );
-              
-                    const web3 = new Web3(provider);
-                    const address = new ethers.Wallet(this.PRIVATE_KEY).address;
-                    const helloWorld = new web3.eth.Contract(SmartContract, this.CONTRACT_ADDRESS);
-              
-                    let gasPrice = this.GAS_PRICE; //gas price in here
-                    let _apep = Web3.utils.fromWei(this.PRICE, 'ether'); //price in here
-                    LogEmitter.log(_apep);
-              
-                    let function_array = this.FUNCTION_NAME.split('('); //function name here
-                    let argm = function_array[1].split(')');
-                    let argss= argm[0].split(',');
-                    LogEmitter.log(argss)
-              
-                    var doTestFunc = helloWorld.methods[function_array[0]];
-                    let tes = [...argss]
-              
-                    LogEmitter.log(doTestFunc(...tes).send({
-                      gasLimit: gasPrice, 
-                      to: this.CONTRACT_ADDRESS,
-                      from: address,
-                      value: (parseInt(_apep)).toString(),
-                    }))
-                    console.log(chalk.green("Successfully minted!"));
-                })
-            } catch {
-                console.log(chalk.red("Error with mint! Please check your inputs." ));
+              this.mintwithfunctionname();
+            } catch (e) {
+                console.log(chalk.red(e));
                 
-                setTimeout(() => {
-                  startMenu(); 
-                }, 2000);
+                // setTimeout(() => {
+                //   startMenu(); 
+                // }, 2000);
             }
         }
       }
       }
 
+      async mintwithfunctionname () {
+        try {
+          function getContractAbi(contract) {
+            return new Promise(resolve => {
+              axios.get(`https://api-rinkeby.etherscan.io/api?module=contract&action=getabi&address=${contract}&apikey=8PYU2IVYBPRXZEYI28FPTK5CIE53K85SU6`)
+              .then((response) => {
+                resolve(response.data.result);
+              });  
+            });
+          };
+          
+            const contract_address = this.CONTRACT_ADDRESS; //address of the contract goes here
+          
+            await getContractAbi(contract_address).then(async (abi) => {
+                let SmartContract = abi;
+                SmartContract = JSON.parse(SmartContract)
+          
+                const pKey = this.PRIVATE_KEY; //put user pk in jere
+          
+                let provider = new HDWalletProvider(
+                  [pKey],
+                  'https://rinkeby.infura.io/v3/b38e1437734a404f9ff3d070d5ddad40',
+                  0
+                );
+          
+                const web3 = new Web3(provider);
+                const address = new ethers.Wallet(pKey).address;
+                const helloWorld = new web3.eth.Contract(SmartContract, contract_address);
+          
+                let gasPrice = parseInt(this.GAS_PRICE); //gas price in here
+                let _apep = await Web3.utils.fromWei(this.PRICE, 'ether'); //price in here
+                console.log(_apep);
+          
+                let function_array = this.FUNCTION_NAME.split('('); //function name here
+                let argm = function_array[1].split(')');
+                let argss= argm[0].split(',');
+                console.log(argss)
+          
+                var doTestFunc = helloWorld.methods[function_array[0]];
+                let tes = [...argss]
+          
+                console.log(await doTestFunc(...tes).send({
+                  gasLimit: gasPrice, 
+                  to: contract_address,
+                  from: address,
+                  value: (parseInt(_apep)).toString(),
+                }))
+          
+                console.log(chalk.green("Successfully minted!"));
+
+                setTimeout(() => {
+                  init();
+                }, 2500);
+          
+            })
+        } catch (e) {
+          console.log(e);
+          setTimeout(() => {
+            init();
+          }, 2500);
+        }
+      }
 
     isRunning() {
         if (this.RUNNING) {

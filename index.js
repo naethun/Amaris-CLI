@@ -6,6 +6,8 @@ import chalk from "chalk";
 import rpc from "discord-rpc";
 const client = new rpc.Client({ transport: 'ipc' });
 
+import axios from 'axios'
+
 import { CSVParser } from "./libs/csv.js";
 let csv = new CSVParser()
 
@@ -18,6 +20,7 @@ EventEmitter.on("task_stopped", () => {
 });
 
 import theblockchainapi from 'theblockchainapi';
+import { stringify } from "querystring";
 let defaultClient = theblockchainapi.ApiClient.instance;
 
 let APIKeyID = defaultClient.authentications['APIKeyID'];
@@ -88,7 +91,10 @@ function login (key) {
 
             console.log("Welcome " + chalk.blue(auth.discord.username) + "!")
             console.log(` `)
-            startMenu();
+            fetchItems().then( () => {
+                console.log(` `)
+                startMenu()
+            })
         }
     })
 }
@@ -139,6 +145,17 @@ client.login({ clientId : '958506386562621450' }).catch(console.error);
         })
     });
 
+
+const fetchItems = async ()=> {
+    var data = await fetch('https://api.nomics.com/v1/currencies/ticker?key=5dd4044a25cc251fcfa64606786b9cdc771399eb&ids=ETH,SOL&interval=1h&per-page=100&page=1')
+
+    await data.json().then(data_ => {
+        var eth = parseFloat(data_[0].price).toFixed(2)
+        var sol = parseFloat(data_[1].price).toFixed(2)
+
+        console.log(chalk.green(`ETH: $ ${eth} SOL: $ ${sol}`))
+    })
+}
 
 export const startMenu = () => {
     global.prompt = inquirer.prompt([
@@ -202,7 +219,7 @@ export const startMenu = () => {
                             choices:
                             [
                                 {
-                                    name: "SOL Balance Check",
+                                    name: "SOL Balance Checker",
                                     value: "solbalance"
                                 },
                                 {
@@ -210,16 +227,68 @@ export const startMenu = () => {
                                     value: "solTransfer"
                                 },
                                 {
-                                    name: "Magic Eden List",
-                                    value: "melist"
-                                },
-                                {
-                                    name:"Magic Eden Delist",
-                                    value: "medelist"
+                                    name: "Magic Eden Top Collections",
+                                    value: "topCollections"
                                 }
                             ]
                         }
                     ]).then((answers) => {
+                        if(answers.settings == "topCollections"){
+                            inquirer.prompt([
+                                {
+                                    type:"list",
+                                    name: "day",
+                                    message: "Which top collections would you like to see:",
+                                    choices: [
+                                        {
+                                            name: "1 day top collections",
+                                            value: "7"
+                                        },
+                                        {
+                                            name: "7 day top collections",
+                                            value: "7"
+                                        },
+                                        {
+                                            name: "30 day top collections",
+                                            value: "7"
+                                        }
+                                    ]
+                                }
+                            ]).then ((answers) => {
+                                                                    
+                                for(var i = 1; i < 7; i += 1) {
+                                    setTimeout(() => {
+                                        console.log(chalk.yellow("Grabbing collections data...."));
+                                    }, 1000);
+                                }
+                                
+                                const track = async () => {
+                                    const url = 'https://api.blockchainapi.com/third-party-apis/2d9UPbepdAmCwqJ5cExy/v0.0.1/utility/getVolumeMetric';
+                                    const headers = {
+                                        "APIKeyId": "UYGlEprUnMGV41f",
+                                        "APISecretKey": "Cb9XpBZwqtHq5lQ"
+                                    };
+                                    const response = await axios.post(
+                                        url,
+                                        {
+                                            "timeline": answers.day
+                                        }, 
+                                        {
+                                            headers
+                                        }
+                                    );
+
+                                    if (i > 5){
+                                        setTimeout(() => {
+                                            console.log(response.data.volumes);
+                                        }, 1000);
+                                    }
+                                }
+                                
+                                track()
+                            })
+                        }
+
                         if (answers.settings == "solTransfer"){
                             inquirer.prompt([
                                 {

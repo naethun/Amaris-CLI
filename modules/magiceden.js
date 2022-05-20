@@ -10,7 +10,7 @@ import { ModuleBase } from "./module_base.js";
 import chalk from "chalk";
 import fetch from 'node-fetch';
 import fs from "fs";
-import { startMenu } from '../index.js'
+import { startMenu, init } from '../index.js'
 
 
 export default class MagicEdenModule extends ModuleBase {
@@ -266,8 +266,8 @@ export default class MagicEdenModule extends ModuleBase {
                 console.log(chalk.greenBright('Successfully sniped but possibly a failed transaction. Please check the TXID on SolScan: ' + finalTX));
 
                 setTimeout(() => {
-                    startMenu();
-                }, 2000);
+                    init();
+                }, 2500);
 
                 var DISCORDURL = "https://discord.com/api/webhooks/969460365689778176/QuWw9kf4r8I_wGZCNma3QWrcoHboIwy2V_Yr-bDS2iaCRAJAD5bD5kYA2T9U-wyTOaNX";
                 fetch(DISCORDURL, {
@@ -293,7 +293,7 @@ export default class MagicEdenModule extends ModuleBase {
                                     },
                                     {
                                       "name": "Price:",
-                                      "value": this.nftData.price,
+                                      "value": this.PRICE,
                                       "inline": true
                                     }
                                   ],

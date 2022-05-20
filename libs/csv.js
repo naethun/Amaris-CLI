@@ -7,7 +7,6 @@ export class CSVParser {
     }
     read(path) {
         return new Promise((resolve, reject) => {
-            
             fs.createReadStream('./presave/magiceden.csv')
             .pipe(csv())
             .on('data', (data) => {
@@ -18,15 +17,6 @@ export class CSVParser {
             });
 
             fs.createReadStream('./presave/cmv2.csv')
-            .pipe(csv())
-            .on('data', (data) => {
-                this.results.push(data);
-            })
-            .on('end', () => {
-                resolve(this.results);
-            });
-
-            fs.createReadStream('./presave/ethcontract.csv')
             .pipe(csv())
             .on('data', (data) => {
                 this.results.push(data);
