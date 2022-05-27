@@ -207,43 +207,48 @@ export default class MagicEdenModule extends ModuleBase {
     async buyNFT() {
         if (this.isRunning()) {
             try {
-                if( this.nftData.price < this.WISH_PRICE){
-                    console.log(chalk.green("Found a cheaper listing than" + " " + this.WISH_PRICE))
-                }
-
-                let NFTBuyHeaders = {
-                    "accept": "application/json, text/plain, */*",
-                    "accept-language": "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7",
-                    "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"",
-                    "sec-ch-ua-mobile": "?0",
-                    "sec-ch-ua-platform": "\"macOS\"",
-                    "sec-fetch-dest": "empty",
-                    "sec-fetch-mode": "cors",
-                    "sec-fetch-site": "same-site",
-                    "Referer": "https://www.magiceden.io/",
-                    "Referrer-Policy": "strict-origin-when-cross-origin"
-                }
-
-                let NFTBuyOptions = {
-                    "mode": "cors",
-                    "credentials": "omit"
-                }
-
-                httpUtils.tlsHttpGet(
-                    "https://api-mainnet.magiceden.io/v2/instructions/buy_now?buyer=" + this.PAYER.publicKey + "&seller=" +  this.nftData.seller + "&auctionHouseAddress=" +  this.nftData.auction_house + "&tokenMint=" +  this.nftData.mint_token + "&tokenATA=" +  this.nftData.token_ata + "&price=" +  this.nftData.price + "&sellerReferral=" +  this.nftData.seller_referral + "&sellerExpiry=-1",
-                    NFTBuyHeaders,
-                    NFTBuyOptions,
-                    200
-                ).then((res) => {
-                    let json = res.json;
-                    console.log(chalk.green("Signing the transaction..."))
-                    if (json) {
-                        let TXData = json.tx.data;
-                        this.getAndSendTX(TXData);
+                if(this.nftData.price > this.WISH_PRICE){
+                    console.log(chalk.yellow("No items found. Retrying..."));
+                    setTimeout(this.startQuickTask.bind(this), this.DELAY); 
+                } else {
+                    if( this.nftData.price < this.WISH_PRICE){
+                        console.log(chalk.green("Found a cheaper listing than" + " " + this.WISH_PRICE))
                     }
-                }).catch((e) => {
-                    console.log(chalk.red("Error with snipe: " + e.message));
-                });
+
+                    let NFTBuyHeaders = {
+                        "accept": "application/json, text/plain, */*",
+                        "accept-language": "de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7",
+                        "sec-ch-ua": "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"",
+                        "sec-ch-ua-mobile": "?0",
+                        "sec-ch-ua-platform": "\"macOS\"",
+                        "sec-fetch-dest": "empty",
+                        "sec-fetch-mode": "cors",
+                        "sec-fetch-site": "same-site",
+                        "Referer": "https://www.magiceden.io/",
+                        "Referrer-Policy": "strict-origin-when-cross-origin"
+                    }
+    
+                    let NFTBuyOptions = {
+                        "mode": "cors",
+                        "credentials": "omit"
+                    }
+    
+                    httpUtils.tlsHttpGet(
+                        "https://api-mainnet.magiceden.io/v2/instructions/buy_now?buyer=" + this.PAYER.publicKey + "&seller=" +  this.nftData.seller + "&auctionHouseAddress=" +  this.nftData.auction_house + "&tokenMint=" +  this.nftData.mint_token + "&tokenATA=" +  this.nftData.token_ata + "&price=" +  this.nftData.price + "&sellerReferral=" +  this.nftData.seller_referral + "&sellerExpiry=-1",
+                        NFTBuyHeaders,
+                        NFTBuyOptions,
+                        200
+                    ).then((res) => {
+                        let json = res.json;
+                        console.log(chalk.green("Signing the transaction..."))
+                        if (json) {
+                            let TXData = json.tx.data;
+                            this.getAndSendTX(TXData);
+                        }
+                    }).catch((e) => {
+                        console.log(chalk.red("Error with snipe: " + e.message));
+                    });
+                }
             } catch(err){
                 console.log(chalk.red("Error with snipe: " + err.message));
             }
